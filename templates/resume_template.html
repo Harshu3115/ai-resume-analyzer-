@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Create Resume | AI Resume Analyzer</title>
+  <!-- Bootstrap 5 CSS + Icons + Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Google Fonts (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ========== GLOBAL RESET & CUSTOM STYLES (ORIGINAL RETAINED) ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      scroll-behavior: smooth;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* navbar blur - ORIGINAL STYLE */
+    .navbar-blur {
+      backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* animated gradient header - ORIGINAL */
+    .animated-gradient {
+      background: linear-gradient(-45deg, #e0f2fe, #fae8ff, #d1fae5, #fed7aa);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media print {
+      .no-print {
+        display: none;
+      }
+      body {
+        background: white;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #e2e8f0;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 10px;
+    }
+
+    .rounded-2xl {
+      border-radius: 1.2rem;
+    }
+    .rounded-xl {
+      border-radius: 0.85rem;
+    }
+    
+    /* Custom input styling */
+    .form-control, .form-select {
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      padding: 0.6rem 1rem;
+      transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      outline: none;
+    }
+    textarea.form-control {
+      border-radius: 0.5rem;
+    }
+
+    /* ========== PREMIUM FORM STYLES ========== */
+    .form-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .premium-input {
+      border-radius: 0.75rem !important;
+      border: 1px solid #e2e8f0;
+      padding: 0.6rem 1rem;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+    }
+    .premium-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+    .form-section-card {
+      background: white;
+      border-radius: 1.2rem;
+      transition: 0.1s;
+      border: 1px solid #eef2ff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .btn-premium {
+      background: linear-gradient(100deg, #1e293b, #0f172a);
+      border: none;
+      border-radius: 2rem;
+      padding: 0.7rem 1.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-premium:hover {
+      background: linear-gradient(100deg, #0f172a, #020617);
+      transform: translateY(-2px);
+    }
+    .btn-outline-premium {
+      border: 1.5px solid #1e293b;
+      background: transparent;
+      border-radius: 2rem;
+      padding: 0.7rem 1.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-outline-premium:hover {
+      background: #1e293b;
+      color: white;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================= ORIGINAL NAVBAR (EXACTLY AS PROVIDED) ======================= -->
+  <nav class="navbar navbar-expand-lg navbar-blur sticky-top py-2 no-print">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="/">
+        <div class="">
+          <img src="{{ url_for('static', filename='images/icon.png') }}" alt="Logo" style="height:50px;">
+        </div>
+        <span class="text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+        <span class="badge bg-primary bg-opacity-10 text-primary ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">Create Resume</span>
+      </a>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1 gap-lg-2">
+          <li class="nav-item"><a class="nav-link text-dark" href="/"><i class="fas fa-home me-1 fa-xs"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="/dashboard"><i class="fas fa-chart-line me-1 fa-xs"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="#"><i class="fas fa-history me-1 fa-xs"></i>History</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="#"><i class="fas fa-cog me-1 fa-xs"></i>Settings</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="/chatbot"><i class="fas fa-comments me-1 fa-xs"></i>Chatbot</a></li>
+          <li class="nav-item dropdown ms-1">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-3 py-1" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 0.85rem;">
+    
+                            <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                                class="rounded-circle"
+                                width="32"
+                                height="32"
+                                style="object-fit: cover;">
+
+                            <span class="small fw-medium">{{ session['firstname'] }} {{ session['lastname'] }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+              <li><a class="dropdown-item small" href="/analytics"><i class="fas fa-chart-simple me-2 fa-xs"></i>Analytics</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+            </ul>
+          </li>
+          <li><a href="/create_resume" class="btn btn-success btn-sm rounded-pill px-3" style="font-size: 0.8rem;"><i class="fas fa-plus-circle me-1 fa-xs"></i>Create Resume</a></li>
+        </ul>
+      </div>
+
+      <div class="d-flex d-lg-none align-items-center gap-3">
+        <a href="/create_resume" class="btn btn-success btn-sm rounded-circle p-2" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-plus-circle fa-sm"></i></a>
+        <div class="dropdown">
+          <a class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" style="width: 34px; height: 34px;">
+            <i class="fas fa-user text-primary fa-sm"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><span class="dropdown-item-text fw-semibold small">{{ session['firstname'] }}</span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item small" href="/">Home</a></li>
+            <li><a class="dropdown-item small" href="/dashboard">Dashboard</a></li>
+            <li><a class="dropdown-item small" href="#">History</a></li>
+            <li><a class="dropdown-item small" href="/profile">Profile</a></li>
+            <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+          </ul>
+        </div>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+          <i class="fas fa-bars fs-5"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header with soft light animated gradient (ORIGINAL) -->
+  <div class="animated-gradient py-3 mt-2 rounded-3 text-center mx-3 mx-md-0">
+    <div class="container">
+      <div class="flex justify-center">
+        <img src="{{ url_for('static', filename='images/icon2.png') }}" alt="Logo" style="height: 150px;">
+      </div>
+      <h1 class="display-5 fw-bold text-gray-800">Create Your Resume</h1>
+      <p class="text-secondary fs-5">Fill the form below, then preview your professional resume</p>
+    </div>
+  </div>
+
+  <!-- FORM SECTION ONLY (Preview is on separate page) -->
+  <div class="container py-5">
+    <div class="form-container">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-pen-alt text-primary fs-5"></i>
+            <h5 class="fw-semibold mb-0">Resume Information</h5>
+            <span class="badge bg-primary bg-opacity-10 text-primary ms-2" style="font-size: 0.65rem;">All fields recommended</span>
+          </div>
+        </div>
+        
+        <div class="card-body p-4 p-md-5">
+          <form id="resumeForm">
+            <!-- Personal Information Section -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold text-primary mb-3"><i class="fas fa-user me-2"></i> Personal Information</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">First Name *</label>
+                  <input type="text" id="firstname" name="firstname" required class="form-control premium-input" value="Harshad">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Last Name *</label>
+                  <input type="text" id="lastname" name="lastname" required class="form-control premium-input" value="Shinde">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Email *</label>
+                  <input type="email" id="email" name="email" required class="form-control premium-input" value="harshadshinde3131@gmail.com">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Phone *</label>
+                  <input type="text" id="phone" name="phone" required class="form-control premium-input" value="9322916716">
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">LinkedIn / Portfolio / GitHub</label>
+                  <input type="text" id="linkedin" name="linkedin" placeholder="Optional" class="form-control premium-input" value="linkedin.com/in/harshad-shinde | github.com/Harshu3115">
+                </div>
+              </div>
+            </div>
+
+            <!-- Career Objective -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold text-secondary mb-3"><i class="fas fa-bullseye me-2"></i> Career Objective</h5>
+              <textarea id="objective" name="objective" rows="3" placeholder="Write your career objective..." 
+                class="form-control premium-input">Motivated Computer Science student with strong skills in Java, Spring Boot, and MySQL. Seeking an internship or entry-level backend developer role to apply technical knowledge, build scalable applications, and gain industry experience.</textarea>
+            </div>
+
+            <!-- Technical Skills -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold mb-3"><i class="fas fa-code me-2" style="color:#7c3aed;"></i> Technical Skills</h5>
+              <div>
+                <label class="form-label fw-semibold small">Skills *</label>
+                <textarea id="skills" name="skills" placeholder="e.g., JavaScript, Python, React, Node.js, AWS" 
+                          rows="3" required
+                          class="form-control premium-input">Java, JavaScript, Spring Boot, MySQL, Servlets, JDBC, REST APIs, HTML/CSS, Bootstrap, Git, GitHub</textarea>
+                <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> Separate skills with commas for better formatting</p>
+              </div>
+            </div>
+
+            <!-- Education Section -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold text-success mb-3"><i class="fas fa-graduation-cap me-2"></i> Education</h5>
+              <div>
+                <label class="form-label fw-semibold small">Education Details *</label>
+                <textarea id="education" name="education" placeholder="e.g., B.Tech in Computer Science, University Name, 2022-2026" 
+                          rows="3" required
+                          class="form-control premium-input">B.Tech CSE (2022-2026) – Fabtech Technical Campus, Sangola | CGPA: 7.04</textarea>
+              </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold text-warning mb-3"><i class="fas fa-project-diagram me-2"></i> Projects</h5>
+              <div>
+                <label class="form-label fw-semibold small">Key Projects *</label>
+                <textarea id="projects" name="projects" placeholder="e.g.,• E-Commerce Platform: Built full-stack app" 
+                          rows="4" required
+                          class="form-control premium-input">• Volunteer Management System: Java, Spring Boot, MySQL – Implemented registration, event tracking, role-based access & email notifications.
+• Student Management System: Servlets, JDBC, MySQL – CRUD operations, authentication & search by ID/name.
+• Bus Tracking System: Java, Servlets, MySQL – Real-time CRUD, session management.
+• Tic Tac Toe Game: HTML, CSS, JS – Responsive browser game with DOM logic.</textarea>
+              </div>
+            </div>
+
+            <!-- Experience Section -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold text-danger mb-3"><i class="fas fa-briefcase me-2"></i> Work Experience / Internships</h5>
+              <div>
+                <label class="form-label fw-semibold small">Professional Experience</label>
+                <textarea id="experience" name="experience" placeholder="e.g., Software Engineer Intern | Company Name" 
+                          rows="4"
+                          class="form-control premium-input">Full Stack Web Development Intern – Datex Technology Pvt. Ltd. (Developed frontend/backend with HTML, CSS, Java, MySQL)
+Advanced Java Intern – TechMaven (Hands-on Servlets, JDBC, backend dev)
+Infosys Springboard Internship (Ongoing) – Enterprise Spring Boot applications</textarea>
+              </div>
+            </div>
+
+            <!-- Certifications & Achievements -->
+            <div class="form-section-card p-4 mb-4">
+              <h5 class="fw-semibold mb-3"><i class="fas fa-certificate me-2" style="color:#d97706;"></i> Certifications & Achievements</h5>
+              <div>
+                <label class="form-label fw-semibold small">Certifications / Extracurricular</label>
+                <textarea id="certifications" name="certifications" rows="3" class="form-control premium-input">Java Programming - Great Learning | SQL Fundamentals - Great Learning | Full Stack Web Dev - Yhills | Advanced Java - TechMaven | Barclays LifeSkills Programme | President - CSE Department FTC | Winner Sub-District Kabaddi</textarea>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-3 justify-content-center pt-3">
+              <button type="button" id="previewBtn" class="btn btn-premium text-white px-5 py-3">
+                <i class="fas fa-eye me-2"></i> Preview Resume
+                <i class="fas fa-arrow-right ms-2"></i>
+              </button>
+              <button type="button" id="resetBtn" class="btn btn-outline-premium px-4 py-3">
+                <i class="fas fa-undo-alt me-2"></i> Reset Form
+              </button>
+            </div>
+
+            <div class="alert alert-info bg-info bg-opacity-10 border-0 rounded-3 mt-4">
+              <div class="d-flex gap-2">
+                <i class="fas fa-lightbulb text-info mt-1"></i>
+                <p class="small mb-0">💡 <strong>Pro Tip:</strong> Click "Preview Resume" to see your professionally formatted resume in a new tab. You can then print or save as PDF.</p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer (original style) -->
+  <footer class="bg-white border-top mt-5 py-3 no-print">
+    <div class="container">
+      <div class="row align-items-center text-center text-md-start">
+        <div class="col-md-6">
+          <p class="small text-secondary mb-0" style="font-size: 0.7rem;">&copy; 2025 AI Resume Analyzer — Smart resume-job matching platform</p>
+        </div>
+        <div class="col-md-6 mt-2 mt-md-0">
+          <div class="d-flex justify-content-center justify-content-md-end gap-3 small">
+            <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Privacy</a>
+            <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Terms</a>
+            <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Contact</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Function to collect form data and open preview in new tab
+    function openPreviewInNewTab() {
+      // Get all form values
+      const formData = {
+        firstname: document.getElementById('firstname').value.trim() || "Harshad",
+        lastname: document.getElementById('lastname').value.trim() || "Shinde",
+        email: document.getElementById('email').value.trim() || "email@example.com",
+        phone: document.getElementById('phone').value.trim() || "9322916716",
+        linkedin: document.getElementById('linkedin').value.trim() || "",
+        objective: document.getElementById('objective').value.trim() || "Motivated professional seeking opportunities.",
+        skills: document.getElementById('skills').value.trim() || "Java, Spring Boot",
+        education: document.getElementById('education').value.trim() || "B.Tech CSE",
+        projects: document.getElementById('projects').value.trim() || "Relevant projects listed",
+        experience: document.getElementById('experience').value.trim() || "",
+        certifications: document.getElementById('certifications').value.trim() || ""
+      };
+      
+      // Store data in localStorage to pass to preview page
+      localStorage.setItem('previewResumeData', JSON.stringify(formData));
+      
+      // Open preview page in new tab
+      window.open('/preview_resume', '_blank');
+    }
+    
+    // Reset form to default values (based on PDF sample)
+    function resetForm() {
+      document.getElementById('firstname').value = "Harshad";
+      document.getElementById('lastname').value = "Shinde";
+      document.getElementById('email').value = "harshadshinde3131@gmail.com";
+      document.getElementById('phone').value = "9322916716";
+      document.getElementById('linkedin').value = "linkedin.com/in/harshad-shinde | github.com/Harshu3115";
+      document.getElementById('objective').value = "Motivated Computer Science student with strong skills in Java, Spring Boot, and MySQL. Seeking an internship or entry-level backend developer role to apply technical knowledge, build scalable applications, and gain industry experience.";
+      document.getElementById('skills').value = "Java, JavaScript, Spring Boot, MySQL, Servlets, JDBC, REST APIs, HTML/CSS, Bootstrap, Git, GitHub";
+      document.getElementById('education').value = "B.Tech CSE (2022-2026) – Fabtech Technical Campus, Sangola | CGPA: 7.04";
+      document.getElementById('projects').value = "• Volunteer Management System: Java, Spring Boot, MySQL – Implemented registration, event tracking, role-based access & email notifications.\n• Student Management System: Servlets, JDBC, MySQL – CRUD operations, authentication & search by ID/name.\n• Bus Tracking System: Java, Servlets, MySQL – Real-time CRUD, session management.\n• Tic Tac Toe Game: HTML, CSS, JS – Responsive browser game with DOM logic.";
+      document.getElementById('experience').value = "Full Stack Web Development Intern – Datex Technology Pvt. Ltd. (Developed frontend/backend with HTML, CSS, Java, MySQL)\nAdvanced Java Intern – TechMaven (Hands-on Servlets, JDBC, backend dev)\nInfosys Springboard Internship (Ongoing) – Enterprise Spring Boot applications";
+      document.getElementById('certifications').value = "Java Programming - Great Learning | SQL Fundamentals - Great Learning | Full Stack Web Dev - Yhills | Advanced Java - TechMaven | Barclays LifeSkills Programme | President - CSE Department FTC | Winner Sub-District Kabaddi";
+    }
+    
+    // Attach event listeners
+    document.getElementById('previewBtn').addEventListener('click', openPreviewInNewTab);
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
+  </script>
+</body>
+</html>

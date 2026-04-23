@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Sign Up | AI Resume Analyzer · ATS Smart Screening</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #eef2f7 0%, #d9e3ec 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* static background blobs */
+    .bg-blob {
+      position: fixed;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(43,122,156,0.12) 0%, rgba(27,111,145,0.04) 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .blob-1 {
+      top: -15vh;
+      left: -10vw;
+      width: 65vw;
+      height: 65vw;
+      background: radial-gradient(circle, rgba(30,105,140,0.1) 0%, rgba(30,105,140,0.02) 80%);
+    }
+
+    .blob-2 {
+      bottom: -20vh;
+      right: -15vw;
+      width: 70vw;
+      height: 70vw;
+      background: radial-gradient(circle, rgba(40,150,114,0.08) 0%, rgba(40,150,114,0.02) 80%);
+    }
+
+    /* signup card container */
+    .signup-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      margin: 2rem;
+    }
+
+    .signup-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(2px);
+      border-radius: 0;
+      box-shadow: 0 30px 50px -20px rgba(0, 32, 54, 0.25), 0 0 0 1px rgba(156, 196, 214, 0.3);
+      padding: 2rem 2rem 2.2rem;
+    }
+
+    /* header / logo */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    
+
+    .logo-icon i {
+      font-size: 2.2rem;
+      color: white;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1E3A5F, #2B6E8F);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .tagline {
+      font-size: 0.75rem;
+      color: #517f9a;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* form styling */
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.2rem;
+      position: relative;
+      flex: 1;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8aaec2;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 13px 18px 13px 46px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      border: 1.5px solid #e0edf4;
+      border-radius: 10px;
+      background: white;
+      transition: all 0.2s;
+      outline: none;
+      font-weight: 500;
+      color: #1f3e54;
+    }
+
+    .input-group select {
+      padding: 13px 18px 13px 46px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%238aaec2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      background-repeat: no-repeat;
+      background-position: right 18px center;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      border-color: #2B7A9C;
+      box-shadow: 0 0 0 3px rgba(43, 122, 156, 0.2);
+    }
+
+    .input-group input:focus + i,
+    .input-group select:focus + i {
+      color: #2B7A9C;
+    }
+
+    /* role selector specific */
+    .role-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .role-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #2c627e;
+      margin-bottom: 8px;
+      margin-left: 8px;
+    }
+
+    .role-options {
+      display: flex;
+      gap: 1.2rem;
+      background: #f8fbfd;
+      padding: 8px 16px;
+      border-radius: 60px;
+      border: 1px solid #e0edf4;
+    }
+
+    .role-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #3a6e8c;
+      padding: 6px 12px;
+      border-radius: 40px;
+      transition: 0.2s;
+    }
+
+    .role-option input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #2486AE;
+    }
+
+    .role-option:hover {
+      background: #eaf3f9;
+    }
+
+    /* terms and conditions */
+    .terms-group {
+      margin: 1.2rem 0 1.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .terms-group input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: #2486AE;
+    }
+
+    .terms-group label {
+      font-size: 0.8rem;
+      color: #2c627e;
+      line-height: 1.4;
+    }
+
+    .terms-group a {
+      color: #1C6E8F;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .terms-group a:hover {
+      text-decoration: underline;
+    }
+
+    /* signup button */
+    .signup-btn {
+      background: linear-gradient(95deg, #1D5A7A, #2486AE);
+      border: none;
+      width: 100%;
+      padding: 14px 0;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 18px rgba(29,90,122,0.25);
+      margin-bottom: 1.5rem;
+    }
+
+    .signup-btn i {
+      font-size: 1rem;
+    }
+
+    .signup-btn:hover {
+      background: linear-gradient(95deg, #154f6b, #1b6f91);
+      box-shadow: 0 12px 22px -8px rgba(27,111,145,0.4);
+    }
+
+    /* divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 1rem 0 1.2rem;
+      color: #95b3c5;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: #d4e2ec;
+    }
+
+    /* social signup */
+    .social-signup {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-icon {
+      background: #f0f6fa;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: #2c6e8f;
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid #deecf3;
+    }
+
+    .social-icon:hover {
+      background: white;
+      color: #1d6f8f;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    }
+
+    /* login link */
+    .login-prompt {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #3f6e8c;
+    }
+
+    .login-prompt a {
+      color: #1C6E8F;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid #bdd8e6;
+    }
+
+    .login-prompt a:hover {
+      color: #0b4f6c;
+      border-bottom-color: #0b4f6c;
+    }
+
+    /* info message */
+    .info-message {
+      background: #EFFAF5;
+      border-radius: 60px;
+      padding: 10px 18px;
+      margin-top: 20px;
+      font-size: 0.7rem;
+      text-align: center;
+      color: #1A6C5E;
+      border-left: 3px solid #289672;
+      font-weight: 500;
+    }
+
+    /* responsive */
+    @media (max-width: 550px) {
+      .signup-card {
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      .role-options {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <div class="signup-container">
+    <div class="signup-card">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <img src="{{ url_for('static', filename='images/icon2.png') }}" 
+                         alt="AI Resume Analyzer Logo" 
+                         class="img-fluid" 
+                         style="max-height: 100px;">
+        </div>
+        <h1>Create Account</h1>
+        <div class="tagline">Join ResumAIlytics · AI-Powered ATS Screening & Skill Gap Analysis</div>
+      </div>
+
+      <!-- signup form - static, no JS -->
+      <form action="{{ url_for('signup') }}" method="POST">
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" name="firstname" placeholder="First Name" required>
+          </div>
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" name="lastname" placeholder="Last Name" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" name="username" placeholder="Email Address" autocomplete="email" required>
+        </div>
+
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" placeholder="Password" required>
+          </div>
+          <div class="input-group">
+            <i class="fas fa-check-circle"></i>
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <i class="fas fa-building"></i>
+          <select name="organization" required>
+            <option value="" disabled selected>Select Organization Type</option>
+            <option value="student">Student / Fresh Graduate</option>
+            <option value="professional">Working Professional</option>
+            <option value="recruiter">Recruiter / HR Professional</option>
+            <option value="startup">Startup / Company</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <!-- Role selection (Candidate / Recruiter) -->
+        <div class="role-group">
+          <div class="role-label">I am a:</div>
+          <div class="role-options">
+            <label class="role-option">
+              <input type="radio" name="userRole" value="candidate" checked> 🧑‍💼 Job Seeker / Candidate
+            </label>
+            <label class="role-option">
+              <input type="radio" name="userRole" value="recruiter"> 🏢 Recruiter / Hiring Manager
+            </label>
+          </div>
+        </div>
+
+        <!-- Terms and conditions -->
+        <div class="terms-group">
+          <input type="checkbox" id="termsCheckbox" required>
+          <label for="termsCheckbox">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>, including the use of AI-powered resume analysis and ATS scoring.
+          </label>
+        </div>
+
+        <button type="submit" class="signup-btn">
+          <i class="fas fa-user-plus"></i> Create Free Account
+        </button>
+
+        
+
+        <div class="login-prompt">
+          Already have an account? <a href="/login">Sign in</a>
+        </div>
+        
+        <div class="info-message">
+          <i class="fas fa-robot" style="margin-right: 6px;"></i> 
+          <strong>AI-Powered Features:</strong> RoBERTa-based matching · ATS Score · Skill Gap Detection · Resume Screening
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

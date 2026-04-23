@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard | AI Resume Analyzer</title>
+    <!-- Bootstrap 5 CSS + Icons + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+
+        /* 🌙 DARK MODE - Enhanced comprehensive styles */
+        body.dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        /* Cards */
+        body.dark-mode .card,
+        body.dark-mode .template-card,
+        body.dark-mode .resume-card {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        /* Inputs */
+        body.dark-mode .premium-input {
+            background: #334155;
+            color: white;
+            border: 1px solid #475569;
+        }
+
+        /* Navbar */
+        body.dark-mode .navbar-blur {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #334155;
+        }
+
+        /* Sections */
+        body.dark-mode .section-title {
+            color: #93c5fd;
+        }
+
+        /* Buttons */
+        body.dark-mode .btn {
+            opacity: 0.95;
+        }
+        
+        /* Dark mode text overrides */
+        body.dark-mode .text-dark,
+        body.dark-mode .text-secondary-emphasis {
+            color: #cbd5e1 !important;
+        }
+        
+        body.dark-mode .text-secondary {
+            color: #94a3b8 !important;
+        }
+        
+        /* FIX: Username text color in dark mode - ensures visibility */
+        body.dark-mode .navbar .dropdown-toggle .small,
+        body.dark-mode .navbar .dropdown-toggle span.small,
+        body.dark-mode .dropdown-toggle .fw-medium,
+        body.dark-mode .navbar .nav-link.d-flex span,
+        body.dark-mode .navbar .dropdown-toggle span:not(.badge) {
+            color: #f1f5f9 !important;
+        }
+        
+        /* Fix for the username in both desktop and mobile view */
+        body.dark-mode .navbar-blur .dropdown-toggle .small.fw-medium,
+        body.dark-mode .navbar .nav-link .small.fw-medium {
+            color: #e2e8f0 !important;
+        }
+        
+        /* Ensure user dropdown trigger text is white in dark mode */
+        body.dark-mode a.nav-link.dropdown-toggle[href="#"] span {
+            color: #ffffff !important;
+        }
+        
+        body.dark-mode .card-header.bg-white,
+        body.dark-mode .card-footer.bg-white {
+            background-color: #1e293b !important;
+            border-color: #334155;
+        }
+        
+        body.dark-mode .table-light {
+            background: #0f172a;
+            color: #cbd5e6;
+        }
+        
+        body.dark-mode .table-light th {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+        
+        body.dark-mode .table-hover-custom tbody tr:hover {
+            background-color: #334155;
+        }
+        
+        body.dark-mode .table td {
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+        
+        body.dark-mode .bg-soft-blue {
+            background-color: #1e2a3a !important;
+        }
+        body.dark-mode .bg-soft-green {
+            background-color: #1e2a2a !important;
+        }
+        body.dark-mode .bg-soft-purple {
+            background-color: #2a1e3a !important;
+        }
+        body.dark-mode .bg-soft-orange {
+            background-color: #3a2a1e !important;
+        }
+        
+        body.dark-mode .border-left-blue {
+            border-left-color: #60a5fa;
+        }
+        body.dark-mode .border-left-green {
+            border-left-color: #34d399;
+        }
+        body.dark-mode .border-left-purple {
+            border-left-color: #a78bfa;
+        }
+        body.dark-mode .border-left-orange {
+            border-left-color: #fb923c;
+        }
+        
+        body.dark-mode .progress {
+            background-color: #334155;
+        }
+        
+        body.dark-mode footer {
+            background: #0f172a !important;
+            border-top-color: #334155 !important;
+        }
+        
+        body.dark-mode .welcome-banner {
+            background: linear-gradient(125deg, #4f46e5 0%, #7e22ce 50%, #db2777 100%);
+        }
+        
+        body.dark-mode .navbar-brand .text-dark {
+            color: #f1f5f9 !important;
+        }
+        
+        body.dark-mode .nav-link.text-dark {
+            color: #cbd5e1 !important;
+        }
+        
+        body.dark-mode .nav-link.text-dark:hover {
+            color: white !important;
+        }
+        
+        body.dark-mode .dropdown-menu {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+        
+        body.dark-mode .dropdown-item {
+            color: #cbd5e1;
+        }
+        
+        body.dark-mode .dropdown-item:hover {
+            background-color: #334155;
+            color: white;
+        }
+        
+        body.dark-mode .dropdown-divider {
+            border-top-color: #334155;
+        }
+        
+        body.dark-mode .btn-outline-light {
+            border-color: #94a3b8;
+            color: #f1f5f9;
+        }
+        
+        body.dark-mode .btn-outline-light:hover {
+            background-color: #475569;
+            border-color: #cbd5e1;
+        }
+        
+        body.dark-mode .text-muted {
+            color: #94a3b8 !important;
+        }
+        
+        /* dark mode toggle button animation */
+        .dark-mode-toggle {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        
+        body.dark-mode .dark-mode-toggle {
+            background: #334155;
+            color: #facc15;
+        }
+        
+        .dark-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* ========== GLOBAL RESET & CUSTOM STYLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: background 0.25s ease, color 0.2s ease;
+        }
+
+        /* navbar blur */
+        .navbar-blur {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        /* card hover effect */
+        .dashboard-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 28px -10px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* stat card mild scaling */
+        .stat-card {
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+        .stat-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* progress bar animation */
+        .progress-fill {
+            transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .table-hover-custom tbody tr:hover {
+            background-color: #f8fafc;
+            transition: 0.2s;
+        }
+
+        /* badge styles */
+        .badge-excellent {
+            background-color: #10b981;
+            color: white;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-good {
+            background-color: #eab308;
+            color: #2c2a1e;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-needs {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ===== WELCOME BANNER - FULL LINEAR GRADIENT ONLY FOR BANNER ===== */
+        .welcome-banner {
+            background: linear-gradient(125deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.15);
+            border: none;
+        }
+        .welcome-banner h1,
+        .welcome-banner p {
+            color: white;
+        }
+        .welcome-banner p {
+            color: #f3e8ff !important;
+        }
+        .welcome-banner .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.8);
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .welcome-banner .btn-outline-light:hover {
+            background: white;
+            color: #764ba2;
+            border-color: white;
+        }
+        .welcome-banner .btn-success {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        @media (min-width: 768px) {
+            .welcome-banner h1 {
+                font-size: 1.85rem;
+            }
+        }
+        .welcome-banner h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+        }
+
+        /* quick action buttons */
+        .quick-btn {
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(0.96);
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background: white;
+            }
+            .dashboard-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        /* border left utilities */
+        .border-left-blue {
+            border-left: 3px solid #3b82f6;
+        }
+        .border-left-green {
+            border-left: 3px solid #10b981;
+        }
+        .border-left-purple {
+            border-left: 3px solid #8b5cf6;
+        }
+        .border-left-orange {
+            border-left: 3px solid #f97316;
+        }
+        .bg-soft-blue {
+            background-color: #eff6ff;
+        }
+        .bg-soft-green {
+            background-color: #ecfdf5;
+        }
+        .bg-soft-purple {
+            background-color: #f5f3ff;
+        }
+        .bg-soft-orange {
+            background-color: #fff7ed;
+        }
+        .rounded-2xl {
+            border-radius: 1.2rem;
+        }
+        .rounded-xl {
+            border-radius: 0.85rem;
+        }
+        .stat-card .display-5 {
+            font-size: 1.9rem;
+            font-weight: 700;
+        }
+        .stat-card p.text-uppercase {
+            font-size: 0.7rem;
+            letter-spacing: 0.03em;
+        }
+        .stat-card small {
+            font-size: 0.7rem;
+        }
+        .card-header h5, .card h5 {
+            font-size: 1.1rem;
+        }
+        .table td, .table th {
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        .progress {
+            height: 6px;
+        }
+        .list-unstyled li {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        footer small, footer .small {
+            font-size: 0.7rem;
+        }
+        .nav-link {
+            font-size: 0.9rem;
+        }
+        .navbar-brand {
+            font-size: 1.3rem;
+        }
+        .fa-chevron-right {
+            font-size: 0.7rem;
+            margin-top: 0.2rem;
+        }
+        .stat-card .display-5 {
+            font-size: 1.85rem;
+        }
+        @media (max-width: 576px) {
+            body {
+                font-size: 0.9rem;
+            }
+            .stat-card .display-5 {
+                font-size: 1.6rem;
+            }
+            .welcome-banner h1 {
+                font-size: 1.4rem;
+            }
+        }
+        .bg-soft-blue i, .bg-soft-green i, .bg-soft-purple i, .bg-soft-orange i {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================= NAVBAR ======================= -->
+    <nav class="navbar navbar-expand-lg navbar-blur sticky-top py-2 no-print">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="#">
+                <div class="">
+                    <img src="{{ url_for('static', filename='images/icon.png') }}" alt="Logo" style="height:50px;">
+                </div>
+                <span class="text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">Dashboard</span>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1 gap-lg-2">
+                    <li class="nav-item"><a class="nav-link text-dark" href="/"><i class="fas fa-home me-1 fa-xs"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold text-primary border-bottom border-primary border-2" href="#"><i class="fas fa-chart-line me-1 fa-xs"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="/history"><i class="fas fa-history me-1 fa-xs"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="/templates"><i class="fas fa-cog me-1 fa-xs"></i>ResumeTemplates</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="/chatbot"><i class="fas fa-comments me-1 fa-xs"></i>Chatbot</a></li>
+                    <!-- DARK MODE TOGGLE BUTTON - ICON INSIDE NAVBAR -->
+                    <li class="nav-item ms-1 me-1">
+                        <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dark mode toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item dropdown ms-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-3 py-1" href="#" role="button" data-bs-toggle="dropdown" style=" font-size: 0.85rem;">
+    
+                            <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                                class="rounded-circle"
+                                width="32"
+                                height="32"
+                                style="object-fit: cover;">
+
+                            <span class="small fw-medium text-dark">{{ session['firstname'] }} {{ session['lastname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+                            <li><a class="dropdown-item small" href="/analytics"><i class="fas fa-chart-simple me-2 fa-xs"></i>Analytics</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/create_resume" class="btn btn-success btn-sm  px-3" style="font-size: 0.8rem;"><i class="fas fa-plus-circle me-1 fa-xs"></i>Create Resume</a></li>
+                </ul>
+            </div>
+
+            <div class="d-flex d-lg-none align-items-center gap-3">
+                <!-- Mobile dark mode toggle quick button -->
+                <button id="mobileDarkModeToggle" class="dark-mode-toggle" style="width: 32px; height: 32px; font-size: 0.9rem;" aria-label="Dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="/create_resume" class="btn btn-success btn-sm rounded-circle p-2" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-plus-circle fa-sm"></i></a>
+                <div class="dropdown">
+                    <a class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" style="width: 34px; height: 34px;">
+                        <i class="fas fa-user text-primary fa-sm"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span class="dropdown-item-text fw-semibold small">{{ session['firstname'] }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small" href="/">Home</a></li>
+                        <li><a class="dropdown-item small" href="/dashboard">Dashboard</a></li>
+                        <li><a class="dropdown-item small" href="/history">History</a></li>
+                        <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <i class="fas fa-bars fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================= MAIN CONTENT ======================= -->
+    <main class="flex-grow-1 my-4 my-md-5">
+        <div class="container">
+            
+            <!-- Welcome Banner -->
+            <div class="welcome-banner p-4 p-md-5 mb-5 shadow-lg rounded-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="fw-bold d-flex align-items-center gap-2 mb-1"><i class="fas fa-tachometer-alt fa-lg"></i> Welcome back, {{ session['firstname'] }}! 👋</h1>
+                        <p class="mb-0 small">Here's an overview of your resume analysis activity & performance insights</p>
+                    </div>
+                    <div class="col-md-4 mt-3 mt-md-0 d-flex gap-3 justify-content-md-end">
+                        <a href="/" class="btn btn-outline-light rounded-pill px-3 py-1 small"><i class="fas fa-upload me-1 fa-xs"></i> New Analysis</a>
+                        <a href="/create_resume" class="btn btn-success rounded-pill px-3 py-1 small"><i class="fas fa-file-alt me-1 fa-xs"></i> Create Resume</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="row g-4 mb-5">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm stat-card border-left-blue rounded-4">
+                        <div class="card-body d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <p class="text-secondary-emphasis text-uppercase small fw-semibold mb-1" style="font-size: 0.7rem;">Total Analyses</p>
+                                <h2 class="fw-bold text-dark mb-0" style="font-size: 1.85rem;">{{ total_analysis }}</h2>
+                                <small class="text-success" style="font-size: 0.65rem;"><i class="fas fa-arrow-up fa-xs"></i> +12% from last month</small>
+                            </div>
+                            <div class="bg-soft-blue rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-chart-line text-primary" style="font-size: 1.4rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm stat-card border-left-green rounded-4">
+                        <div class="card-body d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <p class="text-secondary-emphasis text-uppercase small fw-semibold mb-1" style="font-size: 0.7rem;">Avg Match Score</p>
+                                <h2 class="fw-bold text-dark mb-0" style="font-size: 1.85rem;">{{ avg_score }}%</h2>
+                                <small class="text-success" style="font-size: 0.65rem;"><i class="fas fa-arrow-up fa-xs"></i> +5% improvement</small>
+                            </div>
+                            <div class="bg-soft-green rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-percent text-success" style="font-size: 1.4rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm stat-card border-left-purple rounded-4">
+                        <div class="card-body d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <p class="text-secondary-emphasis text-uppercase small fw-semibold mb-1" style="font-size: 0.7rem;">Resumes Uploaded</p>
+                                <h2 class="fw-bold text-dark mb-0" style="font-size: 1.85rem;">{{ resumes_uploaded }}</h2>
+                                <small class="text-muted" style="font-size: 0.65rem;">Last 30 days</small>
+                            </div>
+                            <div class="bg-soft-purple rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-file-pdf" style="color:#7c3aed; font-size: 1.4rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm stat-card border-left-orange rounded-4">
+                        <div class="card-body d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <p class="text-secondary-emphasis text-uppercase small fw-semibold mb-1" style="font-size: 0.7rem;">Job Descriptions</p>
+                                <h2 class="fw-bold text-dark mb-0" style="font-size: 1.85rem;">{{ job_desc_count }}</h2>
+                                <small class="text-muted" style="font-size: 0.65rem;">Analyzed this month</small>
+                            </div>
+                            <div class="bg-soft-orange rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-briefcase text-warning" style="font-size: 1.4rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two column layout -->
+            <div class="row g-5">
+                <!-- LEFT COLUMN -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm dashboard-card mb-5 rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom-0 pt-3 pb-1 px-4">
+                            <h5 class="fw-semibold mb-0" style="font-size: 1.05rem;"><i class="fas fa-clock text-primary me-2"></i> Recent Analyses</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover-custom align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4" style="font-size: 0.75rem;">Date</th>
+                                            <th style="font-size: 0.75rem;">Job Title</th>
+                                            <th style="font-size: 0.75rem;">Match Score</th>
+                                            <th class="pe-4" style="font-size: 0.75rem;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in history %}
+                                        <tr>
+                                            <td class="ps-4 text-secondary" style="font-size: 0.8rem;">{{ item[2] }}</td>
+                                            <td class="fw-semibold" style="font-size: 0.85rem;">{{ item[0] }}</td>
+                                            <td><span class="fw-bold text-success" style="font-size: 0.85rem;">{{ item[1] }}%</span></td>
+                                            <td class="pe-4">
+                                                {% if item[1] >= 75 %}
+                                                    <span class="badge-excellent"><i class="fas fa-check-circle fa-xs"></i>Excellent</span>
+                                                {% elif item[1] >= 50 %}
+                                                    <span class="badge-good"><i class="fas fa-chart-line fa-xs"></i>Good</span>
+                                                {% else %}
+                                                    <span class="badge-needs"><i class="fas fa-exclamation-triangle fa-xs"></i>Needs Work</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white text-center border-0 py-2">
+                            <a href="#" class="text-decoration-none fw-semibold text-primary small">View All Analyses →</a>
+                        </div>
+                    </div>
+
+                    <!-- Top Matching Skills Card -->
+                    <div class="card border-0 shadow-sm dashboard-card rounded-4 p-4">
+                        <h5 class="fw-semibold mb-3" style="font-size: 1.05rem;"><i class="fas fa-chart-pie text-primary me-2"></i> Top Matching Skills</h5>
+                        <div class="vstack gap-3">
+                            {% for skill in top_skills %}
+                            <div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-secondary fw-medium" style="font-size: 0.85rem;">{{ skill.name }}</span>
+                                    <span class="small fw-semibold" style="font-size: 0.75rem;">{{ skill.score }}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px; border-radius: 8px; background-color: #e2e8f0;">
+                                    <div class="progress-bar bg-primary progress-fill rounded-pill" style="width: {{ skill.score }}%;"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="col-lg-4">
+                    <!-- Score Distribution Card -->
+                    <div class="card border-0 shadow-sm dashboard-card mb-4 rounded-4 p-4">
+                        <h5 class="fw-semibold mb-3" style="font-size: 1rem;"><i class="fas fa-chart-simple text-primary me-2"></i> Score Distribution</h5>
+                        <div class="vstack gap-3">
+                            <div>
+                                <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;">
+                                    <span>Excellent (75-100%)</span>
+                                    <span class="fw-semibold">3</span>
+                                </div>
+                                <div class="progress" style="height: 5px;"><div class="progress-bar bg-success" style="width: 60%"></div></div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;">
+                                    <span>Good (50-74%)</span>
+                                    <span class="fw-semibold">2</span>
+                                </div>
+                                <div class="progress" style="height: 5px;"><div class="progress-bar bg-warning" style="width: 40%"></div></div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;">
+                                    <span>Needs Work (0-49%)</span>
+                                    <span class="fw-semibold">1</span>
+                                </div>
+                                <div class="progress" style="height: 5px;"><div class="progress-bar bg-danger" style="width: 20%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Recommendations -->
+                    <div class="card border-0 shadow-sm dashboard-card mb-4 rounded-4 p-4">
+                        <h5 class="fw-semibold mb-3" style="font-size: 1rem;"><i class="fas fa-lightbulb text-warning me-2"></i> AI Recommendations</h5>
+                        <ul class="list-unstyled vstack gap-2">
+                            <li class="d-flex gap-2"><i class="fas fa-chevron-right text-primary mt-1 fa-xs"></i> <span style="font-size: 0.8rem;">Add more quantifiable achievements (e.g., "Improved performance by 30%")</span></li>
+                            <li class="d-flex gap-2"><i class="fas fa-chevron-right text-primary mt-1 fa-xs"></i> <span style="font-size: 0.8rem;">Include industry-specific keywords from job descriptions</span></li>
+                            <li class="d-flex gap-2"><i class="fas fa-chevron-right text-primary mt-1 fa-xs"></i> <span style="font-size: 0.8rem;">Highlight leadership and collaboration experiences</span></li>
+                            <li class="d-flex gap-2"><i class="fas fa-chevron-right text-primary mt-1 fa-xs"></i> <span style="font-size: 0.8rem;">Consider adding certifications relevant to your target roles</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Quick Actions Box -->
+                    <div class="card border-0 rounded-4 p-4" style="background: linear-gradient(115deg, #eff6ff, #eef2ff);">
+                        <h5 class="fw-semibold mb-3" style="font-size: 1rem;"><i class="fas fa-bolt text-primary me-2"></i> Quick Actions</h5>
+                        <div class="d-grid gap-2">
+                            <a href="/" class="btn btn-primary quick-btn rounded-pill py-2"><i class="fas fa-upload me-2 fa-xs"></i> New Analysis</a>
+                            <a href="/create_resume" class="btn btn-success quick-btn rounded-pill py-2"><i class="fas fa-file-alt me-2 fa-xs"></i> Create Resume</a>
+                            <a href="/download_pdf" class="btn btn-secondary quick-btn rounded-pill py-2"><i class="fas fa-download me-2 fa-xs"></i> Download Report</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Info -->
+            <div class="mt-5 pt-2">
+                <div class="card bg-white border-0 shadow-sm rounded-4 p-3 text-center">
+                    <p class="small text-muted mb-0" style="font-size: 0.7rem;">
+                        <i class="fas fa-microchip text-primary me-1"></i> Powered by RoBERTa (stsb-roberta-large) — Semantic matching with ~89.5% accuracy
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="bg-white border-top mt-5 py-3 no-print">
+        <div class="container">
+            <div class="row align-items-center text-center text-md-start">
+                <div class="col-md-6">
+                    <p class="small text-secondary mb-0" style="font-size: 0.7rem;">&copy; 2025 AI Resume Analyzer — Smart resume-job matching platform</p>
+                </div>
+                <div class="col-md-6 mt-2 mt-md-0">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3 small">
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Privacy</a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Terms</a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dark mode functionality with localStorage persistence
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+            
+            // Check for saved preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateToggleIcon(true);
+            } else if (savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+                updateToggleIcon(false);
+            } else {
+                // Check system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.body.classList.add('dark-mode');
+                    updateToggleIcon(true);
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    updateToggleIcon(false);
+                }
+            }
+            
+            function updateToggleIcon(isDark) {
+                const iconElements = document.querySelectorAll('#darkModeToggle i, #mobileDarkModeToggle i');
+                iconElements.forEach(icon => {
+                    if (isDark) {
+                        icon.className = 'fas fa-sun';
+                    } else {
+                        icon.className = 'fas fa-moon';
+                    }
+                });
+            }
+            
+            function toggleDarkMode() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                if (isDark) {
+                    localStorage.setItem('theme', 'dark');
+                    updateToggleIcon(true);
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    updateToggleIcon(false);
+                }
+                // Trigger smooth transition for progress bars re-animation
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    if (width) {
+                        bar.style.width = '0%';
+                        setTimeout(() => {
+                            bar.style.width = width;
+                        }, 50);
+                    }
+                });
+            }
+            
+            if (darkModeToggle) darkModeToggle.addEventListener('click', toggleDarkMode);
+            if (mobileDarkModeToggle) mobileDarkModeToggle.addEventListener('click', toggleDarkMode);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Progress bar animation
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                if (width) {
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 60);
+                }
+            });
+            
+            // Initialize dark mode toggle
+            initDarkMode();
+        });
+    </script>
+</body>
+</html>

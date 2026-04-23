@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Resume Match Result | AI Resume Analyzer</title>
+  <!-- Bootstrap 5 CSS + Icons + Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      scroll-behavior: smooth;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: background 0.25s ease, color 0.2s ease;
+    }
+
+    /* 🌙 DARK MODE - Same as Dashboard */
+    body.dark-mode {
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    body.dark-mode .navbar-blur {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #334155;
+    }
+
+    body.dark-mode .navbar-blur .navbar-brand,
+    body.dark-mode .navbar-blur .nav-link {
+      color: #e2e8f0 !important;
+    }
+
+    body.dark-mode .navbar-blur .text-dark {
+      color: #f1f5f9 !important;
+    }
+
+    body.dark-mode .card {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    body.dark-mode .bg-light {
+      background: #334155 !important;
+    }
+
+    body.dark-mode .bg-soft-green {
+      background: #1e293b !important;
+      border-left-color: #10b981;
+    }
+
+    body.dark-mode .bg-soft-red {
+      background: #1e293b !important;
+      border-left-color: #ef4444;
+    }
+
+    body.dark-mode .bg-soft-yellow {
+      background: #1e293b !important;
+      border-left-color: #eab308;
+    }
+
+    body.dark-mode .bg-soft-blue {
+      background: #1e293b !important;
+      border-left-color: #3b82f6;
+    }
+
+    body.dark-mode .skill-badge {
+      background: #334155;
+      color: #93c5fd;
+    }
+
+    body.dark-mode .skill-badge-missing {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    body.dark-mode .text-secondary {
+      color: #94a3b8 !important;
+    }
+
+    body.dark-mode .text-dark {
+      color: #e2e8f0 !important;
+    }
+
+    body.dark-mode .dropdown-menu {
+      background-color: #1e293b;
+      border-color: #334155;
+    }
+
+    body.dark-mode .dropdown-item {
+      color: #cbd5e1;
+    }
+
+    body.dark-mode .dropdown-item:hover {
+      background-color: #334155;
+      color: white;
+    }
+
+    body.dark-mode .dropdown-divider {
+      border-top-color: #334155;
+    }
+
+    body.dark-mode footer {
+      background: #0f172a !important;
+      border-top-color: #334155;
+    }
+
+    body.dark-mode .footer-link {
+      color: #94a3b8 !important;
+    }
+
+    body.dark-mode .footer-link:hover {
+      color: #60a5fa !important;
+    }
+
+    /* Dark mode toggle button */
+    .dark-mode-toggle {
+      transition: all 0.2s ease;
+      cursor: pointer;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    body.dark-mode .dark-mode-toggle {
+      background: #334155;
+      color: #facc15;
+    }
+
+    .dark-mode-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Navbar styles */
+    .navbar-blur {
+      backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .navbar-brand {
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .nav-link {
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.85rem;
+      font-weight: 500;
+      color: #1e293b !important;
+    }
+    .nav-link:hover {
+      color: #3b82f6 !important;
+      background-color: rgba(59, 130, 246, 0.08);
+      border-radius: 0.5rem;
+    }
+    .nav-link.active-nav {
+      color: #3b82f6 !important;
+      font-weight: 600;
+      background-color: transparent;
+    }
+    .profile-dropdown-btn {
+      background-color: #f1f5f9;
+      border-radius: 2rem;
+      padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+      transition: all 0.2s;
+    }
+    .profile-dropdown-btn:hover {
+      background-color: #e2e8f0;
+    }
+    .profile-img-small {
+      width: 32px;
+      height: 32px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+    }
+    .create-resume-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      border-radius: 2rem;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .create-resume-btn:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #059669, #047857);
+      box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Card & result styling */
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1) !important;
+    }
+    .footer-link {
+      transition: color 0.2s ease;
+    }
+    .footer-link:hover {
+      color: #3b82f6;
+    }
+    .progress-bar-custom {
+      transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .bg-soft-green {
+      background-color: #ecfdf5;
+      border-left: 4px solid #10b981;
+    }
+    .bg-soft-red {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+    }
+    .bg-soft-yellow {
+      background-color: #fffbeb;
+      border-left: 4px solid #eab308;
+    }
+    .bg-soft-blue {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+    .skill-badge {
+      display: inline-block;
+      background-color: #dcfce7;
+      color: #166534;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.375rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin: 0.2rem;
+    }
+    .skill-badge-missing {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    .suggestion-list {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      font-size: 0.85rem;
+      color: #374151;
+    }
+    .suggestion-list li {
+      margin-bottom: 0.25rem;
+    }
+    @media print {
+      .no-print { display: none; }
+      body { background: white; }
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+    
+    .btn-success {
+      background-color: #10b981;
+      border-color: #10b981;
+    }
+    .btn-success:hover {
+      background-color: #059669;
+      border-color: #059669;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================= NAVBAR (IDENTICAL TO DASHBOARD) ======================= -->
+    <nav class="navbar navbar-expand-lg navbar-blur sticky-top py-2 no-print">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="/">
+                <div class="">
+                    <img src="{{ url_for('static', filename='images/icon.png') }}" alt="Logo" style="height:50px;">
+                </div>
+                <span class="text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">Chatbot</span>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1 gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1 fa-xs"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-chart-line me-1 fa-xs"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/history"><i class="fas fa-history me-1 fa-xs"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/templates"><i class="fas fa-cog me-1 fa-xs"></i>Resume Templates</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/chatbot"><i class="fas fa-robot me-1 fa-xs"></i>Chatbot</a></li>
+                    <!-- DARK MODE TOGGLE BUTTON - Same as Dashboard -->
+                    <li class="nav-item ms-1 me-1">
+                        <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dark mode toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item dropdown ms-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-3 py-1" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 0.85rem;">
+    
+                            <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                                class="rounded-circle"
+                                width="32"
+                                height="32"
+                                style="object-fit: cover;">
+
+                            <span class="small fw-medium">{{ session['firstname'] }} {{ session['lastname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+                            <li><a class="dropdown-item small" href="/analytics"><i class="fas fa-chart-simple me-2 fa-xs"></i>Analytics</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/create_resume" class="btn btn-success btn-sm rounded-pill px-3" style="font-size: 0.8rem;"><i class="fas fa-plus-circle me-1 fa-xs"></i>Create Resume</a></li>
+                </ul>
+            </div>
+
+            <div class="d-flex d-lg-none align-items-center gap-3">
+                <!-- Mobile dark mode toggle -->
+                <button id="mobileDarkModeToggle" class="dark-mode-toggle" style="width: 32px; height: 32px; font-size: 0.9rem;" aria-label="Dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="/create_resume" class="btn btn-success btn-sm rounded-circle p-2" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-plus-circle fa-sm"></i></a>
+                <div class="dropdown">
+                    <a class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" style="width: 34px; height: 34px;">
+                        <i class="fas fa-user text-primary fa-sm"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span class="dropdown-item-text fw-semibold small">{{ session['firstname'] }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small" href="/">Home</a></li>
+                        <li><a class="dropdown-item small" href="/dashboard">Dashboard</a></li>
+                        <li><a class="dropdown-item small" href="/history">History</a></li>
+                        <li><a class="dropdown-item small" href="/templates">Resume Templates</a></li>
+                        <li><a class="dropdown-item small" href="/chatbot">Chatbot</a></li>
+                        <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <i class="fas fa-bars fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+  <!-- ======================= MAIN CONTENT ======================= -->
+  <main class="flex-grow-1 py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+          <!-- Main Result Card -->
+          <div class="card shadow-sm border-0 rounded-4 card-hover mb-4">
+            <div class="card-body p-4 p-md-5">
+              <h1 class="text-center fw-bold text-primary mb-4" style="color: #1e40af !important;">
+                🎯 Resume Match Result
+              </h1>
+
+              <!-- Score Display -->
+              <div class="text-center mb-3">
+                <span class="fs-3 fw-semibold">ATS Score:</span>
+                <span class="fs-2 fw-bold text-dark">{{ match_score }}%</span>
+              </div>
+
+              <!-- Status Badge -->
+              <div class="text-center mb-4">
+                {% if match_score >= 75 %}
+                  <span class="badge bg-success fs-6 px-3 py-2 rounded-pill"><i class="fas fa-rocket me-1"></i> Excellent Match 🚀</span>
+                {% elif match_score >= 50 %}
+                  <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill"><i class="fas fa-thumbs-up me-1"></i> Good Match 👍</span>
+                {% else %}
+                  <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill"><i class="fas fa-exclamation-triangle me-1"></i> Needs Improvement ⚠️</span>
+                {% endif %}
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="progress mb-5" style="height: 10px; border-radius: 20px;">
+                <div class="progress-bar progress-bar-custom 
+                  {% if match_score >= 75 %} bg-success 
+                  {% elif match_score >= 50 %} bg-warning 
+                  {% else %} bg-danger {% endif %}"
+                  style="width: {{ match_score }}%; border-radius: 20px;">
+                </div>
+              </div>
+
+              <!-- Matched Skills -->
+              {% if matched_skills %}
+              <div class="bg-soft-green p-4 rounded-3 mb-4">
+                <h5 class="fw-semibold text-success mb-3"><i class="fas fa-check-circle me-2"></i> Skills Present</h5>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for skill in matched_skills %}
+                    <span class="skill-badge"><i class="fas fa-check me-1 fa-xs"></i>{{ skill }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- Missing Skills -->
+              {% if missing_skills %}
+              <div class="bg-soft-red p-4 rounded-3 mb-4">
+                <h5 class="fw-semibold text-danger mb-3"><i class="fas fa-times-circle me-2"></i> Missing Skills</h5>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for skill in missing_skills %}
+                    <span class="skill-badge skill-badge-missing"><i class="fas fa-exclamation me-1 fa-xs"></i>{{ skill }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- Suggestions -->
+              {% if suggestions %}
+              <div class="bg-soft-yellow p-4 rounded-3 mb-4">
+                <h5 class="fw-semibold text-warning mb-3"><i class="fas fa-lightbulb me-2"></i> Suggestions</h5>
+                <ul class="suggestion-list">
+                  {% for tip in suggestions %}
+                    <li>{{ tip }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+
+              <!-- Recommended Job Roles -->
+              {% if recommended_jobs %}
+              <div class="bg-soft-blue p-4 rounded-3 mb-4">
+                <h5 class="fw-semibold text-primary mb-3"><i class="fas fa-briefcase me-2"></i> Recommended Job Roles</h5>
+                <ul class="suggestion-list">
+                  {% for job in recommended_jobs %}
+                    <li>{{ job }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+
+              <!-- Resume Analysis -->
+              <div class="bg-light border-start border-4 border-primary p-4 rounded-3 mb-4">
+                <h5 class="fw-semibold text-primary mb-3"><i class="fas fa-file-alt me-2"></i> Resume Analysis</h5>
+                <p class="text-secondary mb-0" style="white-space: pre-wrap; font-size: 0.85rem;">
+                  {{ highlighted_resume | safe }}
+                </p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary rounded-pill px-4 py-2 me-2 mb-2">
+                  <i class="fas fa-upload me-2"></i>Analyze Another Resume
+                </a>
+                <form action="/download_pdf" method="post" class="d-inline-block">
+                  <input type="hidden" name="match_score" value="{{ match_score }}">
+                  <input type="hidden" name="matched_skills" value="{{ matched_skills }}">
+                  <input type="hidden" name="missing_skills" value="{{ missing_skills }}">
+                  <input type="hidden" name="suggestions" value="{{ suggestions }}">
+                  <button type="submit" class="btn btn-success rounded-pill px-4 py-2">
+                    <i class="fas fa-file-pdf me-2"></i>Download PDF Report
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Model Info Card -->
+          <div class="card border-0 shadow-sm rounded-4 text-center bg-white">
+            <div class="card-body py-4">
+              <h6 class="fw-semibold text-primary mb-2"><i class="fas fa-microchip me-2"></i> Model Overview</h6>
+              <p class="small text-secondary mb-0"><strong>Model Used:</strong> RoBERTa (stsb-roberta-large)</p>
+              <p class="small text-secondary mb-0"><strong>Purpose:</strong> Semantic Textual Similarity</p>
+              <p class="small text-secondary mb-0"><strong>Accuracy:</strong> ~89.5% (Pearson correlation)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======================= FOOTER ======================= -->
+  <footer class="bg-white border-top mt-5 py-3 no-print">
+    <div class="container">
+      <div class="row align-items-center text-center text-md-start">
+        <div class="col-md-6">
+          <p class="small text-secondary mb-0" style="font-size: 0.7rem;">&copy; 2025 AI Resume Analyzer — Smart resume-job matching platform</p>
+        </div>
+        <div class="col-md-6 mt-2 mt-md-0">
+          <div class="d-flex justify-content-center justify-content-md-end gap-3 small">
+            <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Privacy</a>
+            <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Terms</a>
+            <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Contact</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dark Mode Functionality
+    function initDarkMode() {
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+      const savedTheme = localStorage.getItem('theme');
+      
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        updateToggleIcon(true);
+      } else if (savedTheme === 'light') {
+        document.body.classList.remove('dark-mode');
+        updateToggleIcon(false);
+      } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+          document.body.classList.add('dark-mode');
+          updateToggleIcon(true);
+          localStorage.setItem('theme', 'dark');
+        } else {
+          updateToggleIcon(false);
+        }
+      }
+      
+      function updateToggleIcon(isDark) {
+        const iconElements = document.querySelectorAll('#darkModeToggle i, #mobileDarkModeToggle i');
+        iconElements.forEach(icon => {
+          if (isDark) {
+            icon.className = 'fas fa-sun';
+          } else {
+            icon.className = 'fas fa-moon';
+          }
+        });
+      }
+      
+      function toggleDarkMode() {
+        const isDark = document.body.classList.toggle('dark-mode');
+        if (isDark) {
+          localStorage.setItem('theme', 'dark');
+          updateToggleIcon(true);
+        } else {
+          localStorage.setItem('theme', 'light');
+          updateToggleIcon(false);
+        }
+      }
+      
+      if (darkModeToggle) darkModeToggle.addEventListener('click', toggleDarkMode);
+      if (mobileDarkModeToggle) mobileDarkModeToggle.addEventListener('click', toggleDarkMode);
+    }
+    
+    // Global variables from backend
+    let matchedSkills = {{ matched_skills | tojson | safe }};
+    let missingSkills = {{ missing_skills | tojson | safe }};
+    let score = "{{ match_score }}";
+    let suggestions = {{ suggestions | tojson | safe }};
+
+    // Chatbot helpers (if chatbot widget exists)
+    function addMessage(message, sender) {
+      let chatbox = document.getElementById("chatbox");
+      if (!chatbox) return;
+      let msgDiv = document.createElement("div");
+      msgDiv.className = sender === "user" 
+        ? "self-end bg-blue-600 text-white px-4 py-2 rounded-2xl max-w-[70%] break-words"
+        : "self-start bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-[70%] break-words";
+      msgDiv.innerText = message;
+      chatbox.appendChild(msgDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function sendMessage() {
+      let input = document.getElementById("userInput");
+      if (!input) return;
+      let message = input.value;
+      if (!message) return;
+      addMessage(message, "user");
+      let typing = document.createElement("div");
+      typing.id = "typing";
+      typing.className = "text-sm text-gray-500";
+      typing.innerText = "Bot is typing...";
+      let chatbox = document.getElementById("chatbox");
+      if (chatbox) chatbox.appendChild(typing);
+      fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          message: message,
+          matched_skills: matchedSkills,
+          missing_skills: missingSkills,
+          score: score,
+          suggestions: suggestions
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        let typingEl = document.getElementById("typing");
+        if (typingEl) typingEl.remove();
+        addMessage(data.reply, "bot");
+      });
+      input.value = "";
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      initDarkMode();
+      
+      let chatbox = document.getElementById("chatbox");
+      if (chatbox) {
+        addMessage("Hi 👋 I am your Resume Assistant. Ask me anything!", "bot");
+      }
+      let userInput = document.getElementById("userInput");
+      if (userInput) {
+        userInput.addEventListener("keypress", function(e) {
+          if (e.key === "Enter") sendMessage();
+        });
+      }
+      // Animate progress bar
+      const progressBar = document.querySelector('.progress-bar-custom');
+      if (progressBar) {
+        const finalWidth = progressBar.style.width;
+        progressBar.style.width = '0%';
+        setTimeout(() => { progressBar.style.width = finalWidth; }, 100);
+      }
+    });
+  </script>
+</body>
+</html>

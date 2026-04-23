@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Resume Preview | AI Resume Analyzer</title>
+    <!-- Bootstrap 5 CSS + Icons + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        /* ========== GLOBAL STYLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* ========== NAVBAR STYLES ========== */
+        .navbar-blur {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-link {
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .nav-link:hover {
+            color: #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.05);
+            border-radius: 0.5rem;
+        }
+        
+        .nav-link.active {
+            color: #3b82f6 !important;
+            font-weight: 600;
+        }
+        
+        .dropdown-menu {
+            border-radius: 0.75rem;
+            border: none;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-top: 0.5rem;
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #eff6ff;
+        }
+        
+        .btn-create-resume {
+            transition: all 0.2s ease;
+        }
+        
+        .btn-create-resume:hover {
+            transform: scale(1.02);
+            background-color: #059669;
+        }
+        
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background-color: white;
+                border-radius: 1rem;
+                padding: 1rem;
+                margin-top: 0.5rem;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+            
+            .nav-link {
+                padding: 0.6rem 0.75rem;
+            }
+        }
+
+        /* ========== RESUME PREVIEW STYLES ========== */
+        .resume-preview {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .resume-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 100%);
+            color: white;
+            padding: 2rem;
+        }
+
+        .resume-section {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .resume-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding-left: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background-color: #eff6ff;
+            color: #1e40af;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.2rem;
+        }
+
+        .skill-tag-soft {
+            background-color: #f3e8ff;
+            color: #6b21a5;
+        }
+
+        .skill-tag-lang {
+            background-color: #e0f2fe;
+            color: #075985;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .resume-preview {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .resume-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================= COMPLETE NAVBAR WITH PROFILE IMAGE ======================= -->
+    <nav class="navbar navbar-expand-lg navbar-blur sticky-top py-2 no-print">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="/">
+                <div>
+                    <img src="{{ url_for('static', filename='images/icon.png') }}" alt="Logo" style="height: 50px;">
+                </div>
+                <span class="text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">Preview</span>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1 gap-lg-2">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/">
+                            <i class="fas fa-home me-1 fa-xs"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/dashboard">
+                            <i class="fas fa-chart-line me-1 fa-xs"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/chatbot">
+                            <i class="fas fa-robot me-1 fa-xs"></i>Chatbot
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/history">
+                            <i class="fas fa-history me-1 fa-xs"></i>History
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/settings">
+                            <i class="fas fa-cog me-1 fa-xs"></i>Settings
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown ms-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 bg-light rounded-pill px-3 py-1" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 0.85rem;">
+                            <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                                 class="rounded-circle"
+                                 width="32"
+                                 height="32"
+                                 style="object-fit: cover;">
+                            <span class="small fw-medium">{{ session['firstname'] }} {{ session['lastname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+                            <li><a class="dropdown-item small" href="/analytics"><i class="fas fa-chart-simple me-2 fa-xs"></i>Analytics</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/create_resume" class="btn btn-success btn-sm rounded-pill px-3" style="font-size: 0.8rem;"><i class="fas fa-plus-circle me-1 fa-xs"></i>Create Resume</a></li>
+                </ul>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div class="d-flex d-lg-none align-items-center gap-3">
+                <a href="/create_resume" class="btn btn-success btn-sm rounded-circle p-2" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus-circle fa-sm"></i>
+                </a>
+                <div class="dropdown">
+                    <a class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" style="width: 34px; height: 34px;">
+                        <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                             class="rounded-circle"
+                             width="28"
+                             height="28"
+                             style="object-fit: cover;">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span class="dropdown-item-text fw-semibold small">{{ session['firstname'] }} {{ session['lastname'] }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small" href="/"><i class="fas fa-home me-2 fa-xs"></i>Home</a></li>
+                        <li><a class="dropdown-item small" href="/dashboard"><i class="fas fa-chart-line me-2 fa-xs"></i>Dashboard</a></li>
+                        <li><a class="dropdown-item small" href="/chatbot"><i class="fas fa-robot me-2 fa-xs"></i>Chatbot</a></li>
+                        <li><a class="dropdown-item small" href="/history"><i class="fas fa-history me-2 fa-xs"></i>History</a></li>
+                        <li><a class="dropdown-item small" href="/settings"><i class="fas fa-cog me-2 fa-xs"></i>Settings</a></li>
+                        <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <i class="fas fa-bars fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================= RESUME PREVIEW CONTENT ======================= -->
+    <main class="flex-grow-1 my-4 my-md-5">
+        <div class="container">
+            
+            <!-- Page Header with Actions -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 no-print">
+                <div>
+                    <h1 class="display-5 fw-bold mb-2" style="background: linear-gradient(135deg, #1e3a8a, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        <i class="fas fa-file-alt text-primary me-2" style="-webkit-text-fill-color: initial;"></i> Resume Preview
+                    </h1>
+                    <p class="text-secondary">Review your professional resume before downloading</p>
+                </div>
+                <div class="d-flex gap-2 mt-3 mt-md-0">
+                    <button onclick="window.print()" class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-print me-2"></i> Print / Save PDF
+                    </button>
+                    <a href="/create_resume" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="fas fa-edit me-2"></i> Edit Resume
+                    </a>
+                </div>
+            </div>
+
+            <!-- Resume Preview Card -->
+            <div class="resume-preview">
+                <!-- Header Section -->
+                <div class="resume-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="fw-bold mb-2" style="font-size: 2.2rem;">{{ resume.full_name }}</h1>
+                            <p class="fs-5 mb-2 text-white-50">{{ resume.title }}</p>
+                            <div class="d-flex flex-wrap gap-3 mt-3 small">
+                                <span><i class="fas fa-envelope me-1"></i> {{ resume.email }}</span>
+                                <span><i class="fas fa-phone me-1"></i> {{ resume.phone }}</span>
+                                {% if resume.location %}
+                                <span><i class="fas fa-map-marker-alt me-1"></i> {{ resume.location }}</span>
+                                {% endif %}
+                                {% if resume.social %}
+                                <span><i class="fas fa-link me-1"></i> {{ resume.social }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="bg-white bg-opacity-20 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user-circle fa-4x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Summary -->
+                {% if resume.summary %}
+                <div class="resume-section">
+                    <h3 class="section-title">Professional Summary</h3>
+                    <p class="text-secondary mb-0" style="line-height: 1.6;">{{ resume.summary }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Work Experience -->
+                {% if resume.experiences %}
+                <div class="resume-section">
+                    <h3 class="section-title">Work Experience</h3>
+                    {% for exp in resume.experiences %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div>
+                                <h5 class="fw-bold mb-0">{{ exp.title }}</h5>
+                                <p class="text-primary small mb-1">{{ exp.company }}</p>
+                            </div>
+                            <span class="text-secondary small">{{ exp.start_date }} - {{ exp.end_date }}</span>
+                        </div>
+                        <p class="text-secondary small mt-2" style="white-space: pre-line;">{{ exp.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Education -->
+                {% if resume.educations %}
+                <div class="resume-section">
+                    <h3 class="section-title">Education</h3>
+                    {% for edu in resume.educations %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div>
+                                <h5 class="fw-bold mb-0">{{ edu.degree }}</h5>
+                                <p class="text-secondary small mb-0">{{ edu.institution }}</p>
+                            </div>
+                            <span class="text-secondary small">{{ edu.year }}</span>
+                        </div>
+                        {% if edu.gpa %}
+                        <p class="text-secondary small mt-1">GPA: {{ edu.gpa }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Technical Skills -->
+                {% if resume.skills %}
+                <div class="resume-section">
+                    <h3 class="section-title">Technical Skills</h3>
+                    <div>
+                        {% for skill in resume.skills %}
+                        <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Soft Skills -->
+                {% if resume.soft_skills %}
+                <div class="resume-section">
+                    <h3 class="section-title">Soft Skills</h3>
+                    <div>
+                        {% for skill in resume.soft_skills %}
+                        <span class="skill-tag skill-tag-soft">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Certifications -->
+                {% if resume.certifications %}
+                <div class="resume-section">
+                    <h3 class="section-title">Certifications</h3>
+                    <ul class="list-unstyled mb-0">
+                        {% for cert in resume.certifications %}
+                        <li class="mb-2"><i class="fas fa-certificate text-primary me-2"></i> {{ cert }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- Languages -->
+                {% if resume.languages %}
+                <div class="resume-section">
+                    <h3 class="section-title">Languages</h3>
+                    <div>
+                        {% for lang in resume.languages %}
+                        <span class="skill-tag skill-tag-lang">{{ lang }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Projects -->
+                {% if resume.projects %}
+                <div class="resume-section">
+                    <h3 class="section-title">Projects</h3>
+                    <ul class="list-unstyled mb-0">
+                        {% for project in resume.projects %}
+                        <li class="mb-2"><i class="fas fa-project-diagram text-primary me-2"></i> {{ project }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Download Options -->
+            <div class="d-flex justify-content-center gap-3 mt-4 no-print">
+                <button onclick="window.print()" class="btn btn-success rounded-pill px-5 py-2">
+                    <i class="fas fa-download me-2"></i> Download as PDF
+                </button>
+                <a href="/create_resume" class="btn btn-outline-primary rounded-pill px-5 py-2">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Edit
+                </a>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4 no-print">
+                <div class="card-body p-3 text-center">
+                    <p class="small text-secondary mb-0">
+                        <i class="fas fa-lightbulb text-warning me-1"></i> 
+                        Tip: Use browser's print dialog (Ctrl+P / Cmd+P) and select "Save as PDF" for a high-quality PDF file.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="bg-white border-top mt-5 py-4 no-print">
+        <div class="container">
+            <div class="row align-items-center text-center text-md-start">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-2 mb-md-0">
+                        <div class="bg-primary rounded p-1">
+                            <i class="fas fa-file-alt text-white fa-sm"></i>
+                        </div>
+                        <span class="fw-bold text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+                    </div>
+                    <p class="small text-secondary mb-0 mt-1" style="font-size: 0.7rem;">&copy; 2025 AI Resume Analyzer — Professional resume builder</p>
+                </div>
+                <div class="col-md-6 mt-2 mt-md-0">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3 small flex-wrap">
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Privacy Policy</a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Terms of Service</a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Print optimization
+        window.onbeforeprint = function() {
+            document.body.style.background = 'white';
+        };
+        window.onafterprint = function() {
+            document.body.style.background = '';
+        };
+    </script>
+</body>
+</html>

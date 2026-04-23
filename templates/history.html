@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Analysis History | AI Resume Analyzer</title>
+    <!-- Bootstrap 5 CSS + Icons + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: background 0.25s ease, color 0.2s ease;
+        }
+
+        /* 🌙 DARK MODE - Same as Dashboard */
+        body.dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .navbar-blur {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #334155;
+        }
+
+        body.dark-mode .navbar-blur .navbar-brand,
+        body.dark-mode .navbar-blur .nav-link {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .navbar-blur .text-dark {
+            color: #f1f5f9 !important;
+        }
+
+        body.dark-mode .card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .card-header,
+        body.dark-mode .card-footer {
+            background: #1e293b !important;
+            border-color: #334155;
+        }
+
+        body.dark-mode .table-light {
+            background: #0f172a;
+        }
+
+        body.dark-mode .table-light th {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        body.dark-mode .table td {
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+
+        body.dark-mode .table-hover-custom tbody tr:hover {
+            background-color: #334155;
+        }
+
+        body.dark-mode .stat-summary {
+            background: #1e293b;
+        }
+
+        body.dark-mode .stat-summary .text-secondary {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .btn-outline-secondary {
+            color: #cbd5e1;
+            border-color: #475569;
+        }
+
+        body.dark-mode .btn-outline-secondary:hover {
+            background-color: #334155;
+            color: white;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #334155;
+            color: white;
+            border-color: #475569;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        body.dark-mode .modal-content {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .modal-header,
+        body.dark-mode .modal-footer {
+            border-color: #334155;
+        }
+
+        body.dark-mode .btn-close {
+            filter: invert(1);
+        }
+
+        body.dark-mode footer {
+            background: #0f172a !important;
+            border-top-color: #334155;
+        }
+
+        body.dark-mode .text-secondary {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: #334155;
+            color: white;
+        }
+
+        body.dark-mode .dropdown-divider {
+            border-top-color: #334155;
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            background: #334155;
+            color: #facc15;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .navbar-blur {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-blur .nav-link {
+            font-size: 0.9rem;
+        }
+
+        .navbar-blur .nav-link.active {
+            color: #3b82f6 !important;
+            font-weight: 600;
+        }
+
+        .history-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .btn-create-resume {
+            transition: all 0.2s ease;
+        }
+        .btn-create-resume:hover {
+            transform: scale(1.02);
+            background-color: #059669;
+        }
+
+        .badge-excellent {
+            background-color: #10b981;
+            color: white;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-good {
+            background-color: #eab308;
+            color: #2c2a1e;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-needs {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .table-hover-custom tbody tr:hover {
+            background-color: #f8fafc;
+            transition: 0.2s;
+        }
+
+        .filter-btn {
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            border-color: #3b82f6 !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        .stat-summary {
+            background: linear-gradient(115deg, #eff6ff, #eef2ff);
+            border-radius: 1rem;
+            transition: all 0.2s;
+        }
+        
+        body.dark-mode .stat-summary {
+            background: #1e293b;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .btn-success:hover {
+            background-color: #059669;
+            border-color: #059669;
+        }
+        
+        .rounded-pill {
+            border-radius: 50rem !important;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================= NAVBAR (IDENTICAL TO DASHBOARD) ======================= -->
+    <nav class="navbar navbar-expand-lg navbar-blur sticky-top py-2 no-print">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="/">
+                <div class="">
+                    <img src="{{ url_for('static', filename='images/icon.png') }}" alt="Logo" style="height:50px;">
+                </div>
+                <span class="text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">Chatbot</span>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1 gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1 fa-xs"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-chart-line me-1 fa-xs"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold text-primary" href="/history"><i class="fas fa-history me-1 fa-xs"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/templates"><i class="fas fa-cog me-1 fa-xs"></i>Resume Templates</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/chatbot"><i class="fas fa-robot me-1 fa-xs"></i>Chatbot</a></li>
+                    <!-- DARK MODE TOGGLE BUTTON - Same as Dashboard -->
+                    <li class="nav-item ms-1 me-1">
+                        <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dark mode toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item dropdown ms-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-3 py-1" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 0.85rem;">
+    
+                            <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                                class="rounded-circle"
+                                width="32"
+                                height="32"
+                                style="object-fit: cover;">
+
+                            <span class="small fw-medium">{{ session['firstname'] }} {{ session['lastname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+                            <li><a class="dropdown-item small" href="/analytics"><i class="fas fa-chart-simple me-2 fa-xs"></i>Analytics</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/create_resume" class="btn btn-success btn-sm rounded-pill px-3" style="font-size: 0.8rem;"><i class="fas fa-plus-circle me-1 fa-xs"></i>Create Resume</a></li>
+                </ul>
+            </div>
+
+            <div class="d-flex d-lg-none align-items-center gap-3">
+                <!-- Mobile dark mode toggle -->
+                <button id="mobileDarkModeToggle" class="dark-mode-toggle" style="width: 32px; height: 32px; font-size: 0.9rem;" aria-label="Dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="/create_resume" class="btn btn-success btn-sm rounded-circle p-2" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-plus-circle fa-sm"></i></a>
+                <div class="dropdown">
+                    <a class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" style="width: 34px; height: 34px;">
+                        <i class="fas fa-user text-primary fa-sm"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span class="dropdown-item-text fw-semibold small">{{ session['firstname'] }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small" href="/">Home</a></li>
+                        <li><a class="dropdown-item small" href="/dashboard">Dashboard</a></li>
+                        <li><a class="dropdown-item small" href="/history">History</a></li>
+                        <li><a class="dropdown-item small" href="/templates">Resume Templates</a></li>
+                        <li><a class="dropdown-item small" href="/chatbot">Chatbot</a></li>
+                        <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <i class="fas fa-bars fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================= MAIN HISTORY CONTENT ======================= -->
+    <main class="flex-grow-1 my-4 my-md-5">
+        <div class="container">
+            
+            <!-- Page Header -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                <div>
+                    <h1 class="display-5 fw-bold mb-2" style="background: linear-gradient(135deg, #1e3a8a, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        <i class="fas fa-history text-primary me-2" style="-webkit-text-fill-color: initial;"></i> Analysis History
+                    </h1>
+                    <p class="text-secondary">View all your past resume analyses and track your progress</p>
+                </div>
+                <a href="/" class="btn btn-primary rounded-pill px-4 mt-3 mt-md-0">
+                    <i class="fas fa-plus-circle me-2"></i> New Analysis
+                </a>
+            </div>
+
+            <!-- Statistics Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-summary p-3 text-center">
+                        <i class="fas fa-chart-line text-primary fs-3 mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ total_analyses }}</h3>
+                        <p class="small text-secondary mb-0">Total Analyses</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-summary p-3 text-center">
+                        <i class="fas fa-percent text-success fs-3 mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ avg_score }}%</h3>
+                        <p class="small text-secondary mb-0">Average Score</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-summary p-3 text-center">
+                        <i class="fas fa-trophy text-warning fs-3 mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ best_score }}%</h3>
+                        <p class="small text-secondary mb-0">Best Score</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-summary p-3 text-center">
+                        <i class="fas fa-calendar-week text-info fs-3 mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ this_month_count }}</h3>
+                        <p class="small text-secondary mb-0">This Month</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
+                <div class="card-body p-3 p-md-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-sm filter-btn active rounded-pill px-3" data-filter="all" style="background-color: #3b82f6; color: white; border: none;">All</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="excellent">Excellent (75-100%)</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="good">Good (50-74%)</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="needs">Needs Work (0-49%)</button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="searchInput" class="form-control form-control-sm rounded-pill" placeholder="Search job title..." style="width: 200px;">
+                            <select id="sortSelect" class="form-select form-select-sm rounded-pill" style="width: 130px;">
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="score-high">Highest score</option>
+                                <option value="score-low">Lowest score</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden history-card">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-semibold mb-0"><i class="fas fa-list-ul text-primary me-2"></i> Your Analysis Records</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover-custom align-middle mb-0" id="historyTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4" style="font-size: 0.75rem;">Date</th>
+                                    <th style="font-size: 0.75rem;">Job Title</th>
+                                    <th style="font-size: 0.75rem;">Match Score</th>
+                                    <th style="font-size: 0.75rem;">Skills Matched</th>
+                                    <th style="font-size: 0.75rem;">Status</th>
+                                    <th class="pe-4 text-center" style="font-size: 0.75rem;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in history %}
+                                <tr data-score="{{ item[1] }}" data-date="{{ item[2] }}" data-title="{{ item[0].lower() }}">
+                                    <td class="ps-4 text-secondary" style="font-size: 0.8rem;">{{ item[2] }}</td>
+                                    <td class="fw-semibold" style="font-size: 0.85rem;">{{ item[0] }}</td>
+                                    <td>
+                                        <span class="fw-bold {% if item[1] >= 75 %}text-success{% elif item[1] >= 50 %}text-warning{% else %}text-danger{% endif %}" style="font-size: 0.85rem;">
+                                            {{ item[1] }}%
+                                        </span>
+                                        <div class="progress mt-1" style="height: 3px; width: 80px;">
+                                            <div class="progress-bar {% if item[1] >= 75 %}bg-success{% elif item[1] >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                 style="width: {{ item[1] }}%;">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <span class="text-secondary small">N/A</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if item[1] >= 75 %}
+                                            <span class="badge-excellent"><i class="fas fa-check-circle fa-xs"></i> Excellent</span>
+                                        {% elif item[1] >= 50 %}
+                                            <span class="badge-good"><i class="fas fa-chart-line fa-xs"></i> Good</span>
+                                        {% else %}
+                                            <span class="badge-needs"><i class="fas fa-exclamation-triangle fa-xs"></i> Needs Work</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4 text-center">
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary rounded-pill view-details"
+                                                    data-title="{{ item[0] }}"
+                                                    data-score="{{ item[1] }}"
+                                                    data-date="{{ item[2] }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detailsModal"
+                                                    style="font-size: 0.7rem;">
+                                                <i class="fas fa-eye fa-xs"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill ms-1"
+                                                    onclick="deleteAnalysis('{{ item[0] }}', '{{ item[2] }}')"
+                                                    style="font-size: 0.7rem;">
+                                                <i class="fas fa-trash-alt fa-xs"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center border-0 py-3">
+                    <p class="small text-secondary mb-0">Showing {{ history|length }} analyses</p>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-5 d-none">
+                <i class="fas fa-inbox text-secondary fa-4x mb-3"></i>
+                <h5 class="text-secondary">No analyses found</h5>
+                <p class="text-secondary small">Try adjusting your search or filters, or start a new analysis.</p>
+                <a href="/" class="btn btn-primary rounded-pill mt-2">Start New Analysis →</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= DETAILS MODAL ======================= -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold" id="detailsModalLabel">
+                        <i class="fas fa-chart-line text-primary me-2"></i> Analysis Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4">
+                    <div class="mb-4">
+                        <h6 class="text-secondary small mb-1">Job Title</h6>
+                        <p class="fw-semibold fs-5" id="modalJobTitle">-</p>
+                    </div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-secondary small mb-1">Analysis Date</h6>
+                            <p id="modalDate" class="fw-medium">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-secondary small mb-1">Match Score</h6>
+                            <p id="modalScore" class="fw-bold fs-3 mb-0">-</p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h6 class="text-secondary small mb-2"><i class="fas fa-check-circle text-success me-1"></i> Matched Skills</h6>
+                        <div id="modalMatchedSkills" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+                    <div class="mb-4">
+                        <h6 class="text-secondary small mb-2"><i class="fas fa-times-circle text-danger me-1"></i> Missing Skills</h6>
+                        <div id="modalMissingSkills" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+                    <div>
+                        <h6 class="text-secondary small mb-2"><i class="fas fa-lightbulb text-warning me-1"></i> Suggestions</h6>
+                        <ul id="modalSuggestions" class="list-unstyled small"></ul>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                    <a href="/" class="btn btn-primary rounded-pill px-4">New Analysis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="bg-white border-top mt-5 py-3 no-print">
+        <div class="container">
+            <div class="row align-items-center text-center text-md-start">
+                <div class="col-md-6">
+                    <p class="small text-secondary mb-0" style="font-size: 0.7rem;">&copy; 2025 AI Resume Analyzer — Smart resume-job matching platform</p>
+                </div>
+                <div class="col-md-6 mt-2 mt-md-0">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3 small">
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Privacy</a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Terms</a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 0.7rem;">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dark Mode Functionality
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateToggleIcon(true);
+            } else if (savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+                updateToggleIcon(false);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) { document.body.classList.add('dark-mode'); updateToggleIcon(true); localStorage.setItem('theme', 'dark'); }
+                else { updateToggleIcon(false); }
+            }
+            function updateToggleIcon(isDark) {
+                const icons = document.querySelectorAll('#darkModeToggle i, #mobileDarkModeToggle i');
+                icons.forEach(icon => { if (isDark) icon.className = 'fas fa-sun'; else icon.className = 'fas fa-moon'; });
+            }
+            function toggleDarkMode() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                updateToggleIcon(isDark);
+            }
+            if (darkModeToggle) darkModeToggle.addEventListener('click', toggleDarkMode);
+            if (mobileDarkModeToggle) mobileDarkModeToggle.addEventListener('click', toggleDarkMode);
+        }
+
+        // Modal data handling
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('modalJobTitle').innerText = this.dataset.title;
+                document.getElementById('modalDate').innerText = this.dataset.date;
+                const score = parseInt(this.dataset.score);
+                document.getElementById('modalScore').innerHTML = `<span class="${score >= 75 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-danger'}">${score}%</span>`;
+                
+                const matchedContainer = document.getElementById('modalMatchedSkills');
+                matchedContainer.innerHTML = '<span class="text-secondary small">No skill data available</span>';
+                
+                const missingContainer = document.getElementById('modalMissingSkills');
+                missingContainer.innerHTML = '<p class="text-secondary small mb-0">No missing skills identified</p>';
+                
+                const suggestionsContainer = document.getElementById('modalSuggestions');
+                suggestionsContainer.innerHTML = '<li class="text-secondary small">No specific suggestions available</li>';
+            });
+        });
+
+        // Filter and search functionality
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentSort = 'newest';
+        
+        function filterTable() {
+            const rows = document.querySelectorAll('#historyTable tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const score = parseInt(row.dataset.score);
+                const title = row.dataset.title;
+                let showByFilter = true;
+                let showBySearch = true;
+                
+                if(currentFilter === 'excellent') showByFilter = score >= 75;
+                else if(currentFilter === 'good') showByFilter = score >= 50 && score < 75;
+                else if(currentFilter === 'needs') showByFilter = score < 50;
+                else showByFilter = true;
+                
+                if(currentSearch) showBySearch = title.includes(currentSearch.toLowerCase());
+                
+                if(showByFilter && showBySearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            const emptyState = document.getElementById('emptyState');
+            if(visibleCount === 0) emptyState.classList.remove('d-none');
+            else emptyState.classList.add('d-none');
+        }
+        
+        function sortTable() {
+            const tbody = document.querySelector('#historyTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                if(currentSort === 'newest') return new Date(b.dataset.date) - new Date(a.dataset.date);
+                else if(currentSort === 'oldest') return new Date(a.dataset.date) - new Date(b.dataset.date);
+                else if(currentSort === 'score-high') return parseInt(b.dataset.score) - parseInt(a.dataset.score);
+                else if(currentSort === 'score-low') return parseInt(a.dataset.score) - parseInt(b.dataset.score);
+                return 0;
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active', 'btn-primary');
+                    b.classList.add('btn-outline-secondary');
+                });
+                this.classList.add('active', 'btn-primary');
+                this.classList.remove('btn-outline-secondary');
+                currentFilter = this.dataset.filter;
+                filterTable();
+            });
+        });
+        
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            currentSearch = e.target.value;
+            filterTable();
+        });
+        
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            currentSort = e.target.value;
+            sortTable();
+            filterTable();
+        });
+        
+        function deleteAnalysis(title, date) {
+            if(confirm(`Are you sure you want to delete the analysis for "${title}" from ${date}?`)) {
+                alert('Delete functionality would be implemented with a POST request to /delete_analysis');
+            }
+        }
+        
+        initDarkMode();
+    </script>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AI Chatbot | Resume Assistant</title>
+    <!-- Bootstrap 5 CSS + Icons + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        /* ========== GLOBAL RESET & DARK MODE READY ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fef9e3 0%, #e6f7f0 50%, #f0e6ff 100%);
+            background-attachment: fixed;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: background 0.25s ease, color 0.2s ease;
+        }
+
+        /* 🌙 DARK MODE - Same as Dashboard */
+        body.dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .navbar-blur {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #334155;
+        }
+
+        body.dark-mode .navbar-blur .navbar-brand,
+        body.dark-mode .navbar-blur .nav-link {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .navbar-blur .text-dark {
+            color: #f1f5f9 !important;
+        }
+
+        body.dark-mode .chat-container {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        body.dark-mode .chat-messages {
+            background: #0f172a;
+        }
+
+        body.dark-mode .message.bot .message-bubble {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .message.user .message-bubble {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        body.dark-mode .chat-input-area {
+            background: #1e293b;
+            border-top-color: #334155;
+        }
+
+        body.dark-mode .chat-input-area .bg-light {
+            background-color: #334155 !important;
+            color: white;
+        }
+
+        body.dark-mode .chat-input-area input {
+            background-color: #334155;
+            color: white;
+            border: 1px solid #475569;
+        }
+
+        body.dark-mode .chat-input-area input::placeholder {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .quick-reply-btn {
+            background-color: #1e293b;
+            border-color: #475569;
+            color: #93c5fd;
+        }
+
+        body.dark-mode .quick-reply-btn:hover {
+            background-color: #3b82f6 !important;
+            color: white !important;
+        }
+
+        body.dark-mode .info-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .info-card p {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode footer {
+            background: #0f172a;
+            border-top-color: #334155;
+        }
+
+        body.dark-mode .text-secondary {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .hover-text-primary:hover {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: #334155;
+            color: white;
+        }
+
+        body.dark-mode .dropdown-divider {
+            border-top-color: #334155;
+        }
+
+        body.dark-mode .btn-outline-light {
+            border-color: #94a3b8;
+            color: #f1f5f9;
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            background: #334155;
+            color: #facc15;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* navbar blur - matching dashboard exactly */
+        .navbar-blur {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-blur .navbar-brand .text-dark {
+            color: #1e293b !important;
+        }
+
+        .navbar-blur .nav-link {
+            color: #1e293b !important;
+            font-size: 0.9rem;
+        }
+
+        .navbar-blur .nav-link:hover {
+            color: #3b82f6 !important;
+        }
+
+        .navbar-blur .nav-link.active {
+            color: #3b82f6 !important;
+            font-weight: 600;
+        }
+
+        /* chat container styles */
+        .chat-container {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: background 0.2s ease;
+        }
+
+        .chat-messages {
+            height: 450px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background: #fefefe;
+            transition: background 0.2s ease;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .message.bot .message-bubble {
+            background: #f1f5f9;
+            color: #1e293b;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            border-radius: 1.25rem;
+            width: fit-content;
+        }
+
+        body.dark-mode .typing-indicator {
+            background: #334155;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-input-area {
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            transition: background 0.2s ease;
+        }
+
+        .quick-reply-btn {
+            transition: all 0.2s ease;
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+        .quick-reply-btn:hover {
+            transform: translateY(-2px);
+            background-color: #3b82f6 !important;
+            color: white !important;
+            border-color: #3b82f6 !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 85%;
+                font-size: 0.85rem;
+            }
+            .chat-messages {
+                height: 380px;
+            }
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+        }
+        
+        body.dark-mode footer {
+            background: #0f172a;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 0.75rem;
+        }
+        
+        body.dark-mode .info-card {
+            background: rgba(30, 41, 59, 0.8);
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .btn-success:hover {
+            background-color: #059669;
+            border-color: #059669;
+        }
+        
+        .hover-text-primary:hover {
+            color: #3b82f6 !important;
+        }
+        
+        body.dark-mode .hover-text-primary:hover {
+            color: #60a5fa !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================= NAVBAR (IDENTICAL TO DASHBOARD) ======================= -->
+    <nav class="navbar navbar-expand-lg navbar-blur sticky-top py-2 no-print">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="/">
+                <div class="">
+                    <img src="{{ url_for('static', filename='images/icon.png') }}" alt="Logo" style="height:50px;">
+                </div>
+                <span class="text-dark">AI<span class="text-primary">ResumeMatch</span></span>
+                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">Chatbot</span>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1 gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1 fa-xs"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-chart-line me-1 fa-xs"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/history"><i class="fas fa-history me-1 fa-xs"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/templates"><i class="fas fa-cog me-1 fa-xs"></i>Resume Templates</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold text-primary" href="/chatbot"><i class="fas fa-robot me-1 fa-xs"></i>Chatbot</a></li>
+                    <!-- DARK MODE TOGGLE BUTTON - Same as Dashboard -->
+                    <li class="nav-item ms-1 me-1">
+                        <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dark mode toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item dropdown ms-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-3 py-1" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 0.85rem;">
+    
+                            <img src="{% if user.profile_image %}{{ url_for('static', filename='uploads/' + user.profile_image) }}{% else %}{{ url_for('static', filename='images/default.png') }}{% endif %}" 
+                                class="rounded-circle"
+                                width="32"
+                                height="32"
+                                style="object-fit: cover;">
+
+                            <span class="small fw-medium">{{ session['firstname'] }} {{ session['lastname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item small" href="/profile"><i class="fas fa-user me-2 fa-xs"></i>Profile</a></li>
+                            <li><a class="dropdown-item small" href="/analytics"><i class="fas fa-chart-simple me-2 fa-xs"></i>Analytics</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/create_resume" class="btn btn-success btn-sm rounded-pill px-3" style="font-size: 0.8rem;"><i class="fas fa-plus-circle me-1 fa-xs"></i>Create Resume</a></li>
+                </ul>
+            </div>
+
+            <div class="d-flex d-lg-none align-items-center gap-3">
+                <!-- Mobile dark mode toggle -->
+                <button id="mobileDarkModeToggle" class="dark-mode-toggle" style="width: 32px; height: 32px; font-size: 0.9rem;" aria-label="Dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="/create_resume" class="btn btn-success btn-sm rounded-circle p-2" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-plus-circle fa-sm"></i></a>
+                <div class="dropdown">
+                    <a class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" style="width: 34px; height: 34px;">
+                        <i class="fas fa-user text-primary fa-sm"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span class="dropdown-item-text fw-semibold small">{{ session['firstname'] }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small" href="/">Home</a></li>
+                        <li><a class="dropdown-item small" href="/dashboard">Dashboard</a></li>
+                        <li><a class="dropdown-item small" href="/history">History</a></li>
+                        <li><a class="dropdown-item small" href="/templates">Resume Templates</a></li>
+                        <li><a class="dropdown-item small" href="/chatbot">Chatbot</a></li>
+                        <li><a class="dropdown-item text-danger small" href="/logout"><i class="fas fa-sign-out-alt me-2 fa-xs"></i>Logout</a></li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <i class="fas fa-bars fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================= MAIN CHAT CONTENT ======================= -->
+    <main class="flex-grow-1 my-4 my-md-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <!-- Chat Header -->
+                    <div class="text-center mb-4">
+                        <div class="bg-white/60 d-inline-block p-3 rounded-4 mb-2 shadow-sm" style="background: rgba(255,255,255,0.6);">
+                            <i class="fas fa-robot text-primary fs-1"></i>
+                        </div>
+                        <h2 class="fw-bold text-gray-800" style="color: inherit;">AI Resume Assistant</h2>
+                        <p class="text-muted">Ask me anything about resumes, job matching, or career advice!</p>
+                    </div>
+
+                    <!-- Chat Container -->
+                    <div class="chat-container">
+                        <!-- Messages Area -->
+                        <div class="chat-messages p-4" id="chatMessages">
+                            <div class="message bot">
+                                <div class="message-bubble">
+                                    <i class="fas fa-robot me-1 text-primary"></i> Hello {{ session['firstname'] }}! 👋<br>
+                                    I'm your AI resume assistant. I can help you with:
+                                    <ul class="mt-2 mb-0 small">
+                                        <li>📝 Resume writing tips</li>
+                                        <li>🎯 Job matching strategies</li>
+                                        <li>💼 Interview preparation</li>
+                                        <li>📊 ATS optimization</li>
+                                    </ul>
+                                    <div class="mt-2">How can I assist you today?</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Reply Suggestions -->
+                        <div class="px-4 pb-2 pt-1 border-top" id="quickReplies" style="border-color: #e2e8f0;">
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <button class="btn btn-sm quick-reply-btn rounded-pill" data-question="How to write a better resume?">📝 Resume tips</button>
+                                <button class="btn btn-sm quick-reply-btn rounded-pill" data-question="What skills are most in demand?">🔥 In-demand skills</button>
+                                <button class="btn btn-sm quick-reply-btn rounded-pill" data-question="How to optimize for ATS?">🤖 ATS optimization</button>
+                                <button class="btn btn-sm quick-reply-btn rounded-pill" data-question="Tell me about match score">📊 Match score</button>
+                                <button class="btn btn-sm quick-reply-btn rounded-pill" data-question="How can I improve my resume score?">📈 Improve score</button>
+                            </div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="chat-input-area p-3">
+                            <div class="input-group">
+                                <input type="text" id="userInput" class="form-control border-0 bg-light rounded-pill py-2 px-3" placeholder="Type your message..." autocomplete="off">
+                                <button class="btn btn-primary rounded-pill px-4 ms-2" id="sendBtn">
+                                    <i class="fas fa-paper-plane"></i> Send
+                                </button>
+                            </div>
+                            <div class="text-muted small mt-2 text-center">
+                                <i class="fas fa-microchip"></i> Powered by AI | Ask about resume, jobs, or career growth
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="mt-4 text-center">
+                        <div class="info-card rounded-3 p-3">
+                            <p class="small mb-0">
+                                <i class="fas fa-lightbulb text-warning me-1"></i> Try asking: "How can I improve my resume score?" or "What keywords should I add?"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="border-top mt-5 py-3 no-print">
+        <div class="container">
+            <div class="row align-items-center text-center text-md-start">
+                <div class="col-md-6">
+                    <p class="small text-secondary mb-0" style="font-size: 0.7rem;">&copy; 2025 AI Resume Analyzer — Smart resume-job matching platform</p>
+                </div>
+                <div class="col-md-6 mt-2 mt-md-0">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3 small">
+                        <a href="#" class="text-decoration-none text-secondary hover-text-primary" style="font-size: 0.7rem;">Privacy</a>
+                        <a href="#" class="text-decoration-none text-secondary hover-text-primary" style="font-size: 0.7rem;">Terms</a>
+                        <a href="#" class="text-decoration-none text-secondary hover-text-primary" style="font-size: 0.7rem;">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const quickReplyBtns = document.querySelectorAll('.quick-reply-btn');
+
+        // Dark Mode Functionality (identical to dashboard)
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+            
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateToggleIcon(true);
+            } else if (savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+                updateToggleIcon(false);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.body.classList.add('dark-mode');
+                    updateToggleIcon(true);
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    updateToggleIcon(false);
+                }
+            }
+            
+            function updateToggleIcon(isDark) {
+                const iconElements = document.querySelectorAll('#darkModeToggle i, #mobileDarkModeToggle i');
+                iconElements.forEach(icon => {
+                    if (isDark) {
+                        icon.className = 'fas fa-sun';
+                    } else {
+                        icon.className = 'fas fa-moon';
+                    }
+                });
+            }
+            
+            function toggleDarkMode() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                if (isDark) {
+                    localStorage.setItem('theme', 'dark');
+                    updateToggleIcon(true);
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    updateToggleIcon(false);
+                }
+            }
+            
+            if (darkModeToggle) darkModeToggle.addEventListener('click', toggleDarkMode);
+            if (mobileDarkModeToggle) mobileDarkModeToggle.addEventListener('click', toggleDarkMode);
+        }
+
+        // Smart AI response function
+        function getBotResponse(userMessage) {
+            const msg = userMessage.toLowerCase().trim();
+            
+            if (msg.includes('resume tip') || msg.includes('improve resume') || msg.includes('better resume') || msg.includes('write a better resume')) {
+                return "📝 Here are 3 quick resume tips:\n\n1️⃣ **Use action verbs** - Start bullet points with words like 'Led', 'Developed', 'Increased'\n2️⃣ **Quantify achievements** - Add numbers (e.g., 'Improved efficiency by 30%')\n3️⃣ **Tailor for each job** - Match keywords from the job description\n\nWould you like specific examples for your role?";
+            }
+            
+            if (msg.includes('improve my resume score') || msg.includes('increase score') || (msg.includes('score') && msg.includes('improve'))) {
+                return "📈 **To improve your resume match score:**\n\n• Add more keywords from the job description\n• Include specific technical skills mentioned in the JD\n• Quantify your achievements with metrics\n• Use industry-standard terminology\n• Make sure your resume sections are clearly labeled\n\nWant me to analyze specific keywords you should add?";
+            }
+            
+            if (msg.includes('ats') || msg.includes('optimize') || msg.includes('applicant tracking')) {
+                return "🤖 **ATS Optimization Tips:**\n\n• Use standard section headings (Work Experience, Education, Skills)\n• Avoid graphics, tables, or columns\n• Include keywords from job description naturally\n• Use .docx or .pdf format (ATS-friendly)\n• Spell out acronyms at least once\n\nWant me to analyze a specific keyword strategy?";
+            }
+            
+            if (msg.includes('match score') || (msg.includes('score') && msg.includes('match')) || msg.includes('matching')) {
+                return "📊 **Resume Match Score Explained:**\n\nOur AI uses RoBERTa (state-of-the-art NLP) to semantically compare your resume with job descriptions.\n\n• **75-100%** : Excellent match - You're highly qualified!\n• **50-74%** : Good match - Add more relevant keywords\n• **0-49%** : Needs improvement - Focus on skill alignment\n\nTip: The more industry-specific terms you include, the higher your score!";
+            }
+            
+            if (msg.includes('skill') || msg.includes('in demand') || msg.includes('popular skills')) {
+                return "🔥 **Most In-Demand Skills (2025):**\n\n**Tech:** Python, React, AWS, AI/ML, Data Science, Cloud Computing\n**Soft Skills:** Communication, Leadership, Problem-solving, Adaptability\n**Emerging:** Prompt Engineering, Cybersecurity, Green Tech\n\nWant suggestions for your specific industry? Tell me your target role!";
+            }
+            
+            if (msg.includes('interview') || msg.includes('preparation') || msg.includes('prepare for interview')) {
+                return "💼 **Interview Preparation Tips:**\n\n• Research the company thoroughly\n• Practice STAR method (Situation, Task, Action, Result)\n• Prepare questions to ask the interviewer\n• Review common technical/behavioral questions\n• Highlight achievements from your resume\n\nNeed help with a specific type of interview?";
+            }
+            
+            if (msg.includes('cover letter') || msg.includes('cover')) {
+                return "✉️ **Cover Letter Tips:**\n\n• Keep it concise (3-4 paragraphs)\n• Address hiring manager by name if possible\n• Show enthusiasm for the company\n• Connect your skills to their needs\n• End with a call to action\n\nWant me to help structure a cover letter for a specific job?";
+            }
+            
+            if (msg.includes('salary') || msg.includes('negotiation') || msg.includes('pay')) {
+                return "💰 **Salary Negotiation Advice:**\n\n• Research market rates (Glassdoor, Levels.fyi)\n• Know your minimum acceptable offer\n• Highlight your unique value\n• Practice negotiation conversations\n• Consider total compensation (benefits, stock, bonus)\n\nRemember: Most employers expect negotiation!";
+            }
+            
+            if (msg.match(/^(hi|hello|hey|greetings|good morning|good afternoon)/i)) {
+                return "Hello! 👋 I'm your AI resume assistant. How can I help you today? You can ask about resume tips, ATS optimization, match scores, interview prep, or career advice!";
+            }
+            
+            if (msg.includes('thank') || msg.includes('thanks')) {
+                return "You're very welcome! 😊 I'm glad to help. Feel free to ask if you need more assistance with your resume or job search!";
+            }
+            
+            if (msg.includes('help') || msg.includes('what can you do') || msg.includes('commands')) {
+                return "🤖 **I can help you with:**\n\n• Resume writing & improvement tips\n• ATS optimization strategies\n• Job match score explanation\n• In-demand skills for 2025\n• Interview preparation\n• Cover letter guidance\n• Salary negotiation\n• Career change advice\n\nJust ask me anything!";
+            }
+            
+            return "Thanks for your message! 🤖 I'm here to help with resume-related questions. You can ask me about:\n\n• Resume tips & improvement\n• ATS optimization\n• Job matching scores\n• In-demand skills\n• Interview preparation\n• Career advice\n\nCould you rephrase your question? I'd love to assist you better!";
+        }
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            
+            if (!isUser) {
+                let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                formattedText = formattedText.replace(/\n/g, '<br>');
+                bubble.innerHTML = `<i class="fas fa-robot me-1 text-primary"></i> ${formattedText}`;
+            } else {
+                bubble.textContent = text;
+            }
+            
+            messageDiv.appendChild(bubble);
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom();
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+        
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, true);
+            userInput.value = '';
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                removeTypingIndicator();
+                const response = getBotResponse(message);
+                addMessage(response, false);
+            }, 600 + Math.random() * 400);
+        }
+        
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        quickReplyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.getAttribute('data-question');
+                userInput.value = question;
+                sendMessage();
+            });
+        });
+        
+        userInput.focus();
+        
+        // Initialize dark mode
+        initDarkMode();
+    </script>
+</body>
+</html>
