@@ -1,19 +1,44 @@
-# 🚀 AI Resume Analyzer
+<h1 align="center">🚀 AI Resume Analyzer</h1>
+<p align="center">
+  Smart Resume Analysis & ATS Matching System
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-blue" />
+  <img src="https://img.shields.io/badge/Flask-Web%20App-green" />
+  <img src="https://img.shields.io/badge/Deployment-Render-purple" />
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
+</p>
+
+---
+
+## 📌 Overview
 
 An AI-powered web application that analyzes resumes, extracts key skills, matches them with job descriptions, and provides intelligent suggestions to improve ATS score.
 
 ---
 
-## 📌 Features
+## ✨ Features
 
 * 📄 Upload Resume (PDF/DOCX)
-* 🧠 Extract Skills Automatically
-* 🎯 Match Resume with Job Description
-* 📊 Calculate Match Score
-* ✨ Suggest Missing Skills
+* 🧠 Automatic Skill Extraction
+* 🎯 Resume vs Job Description Matching
+* 📊 ATS Score Calculation
+* ✨ Missing Skills Suggestions
 * 🔐 User Authentication (Login / Signup)
 * 📧 Forgot Password via Email
-* 📥 Generate & Download Resume
+* 📥 Resume Builder & Download Feature
+
+---
+
+## ⚙️ How It Works
+
+1. Upload your resume (PDF/DOCX)
+2. Enter the job description
+3. System extracts skills from resume
+4. Matches with job requirements
+5. Calculates match score
+6. Displays missing skills & suggestions
 
 ---
 
@@ -22,12 +47,13 @@ An AI-powered web application that analyzes resumes, extracts key skills, matche
 * **Backend:** Flask (Python)
 * **Frontend:** HTML, CSS, Bootstrap
 * **Database:** SQLite
-* **Libraries:**
 
-  * PyMuPDF
-  * python-docx
-  * Flask-Mail
-  * Authlib
+**Libraries Used:**
+
+* PyMuPDF
+* python-docx
+* Flask-Mail
+* Authlib
 
 ---
 
@@ -70,7 +96,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Run the app
+### 4. Run the application
 
 ```
 python app.py
@@ -82,7 +108,7 @@ python app.py
 
 Deployed on **Render**
 
-### Environment Variables:
+### Required Environment Variables:
 
 ```
 MAIL_USERNAME=your_email@gmail.com
@@ -96,60 +122,27 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 
 ## 📸 Screenshots
 
-### 🏠 Home Page
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/fe5d27dd-b729-4b8f-b2ff-73777cace1ee" width="45%" />
+  <img src="https://github.com/user-attachments/assets/275d3372-a03f-4491-9f8d-0099a10adc29" width="45%" />
+</p>
 
-<img width="1916" height="870" alt="Screenshot 2026-04-23 163608" src="https://github.com/user-attachments/assets/fe5d27dd-b729-4b8f-b2ff-73777cace1ee" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3a29d51b-4329-4edc-a8d6-70ff1cf2cada" width="45%" />
+  <img src="https://github.com/user-attachments/assets/dd23fcc7-34e3-45d3-932d-9f95f3afa8d2" width="45%" />
+</p>
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2facecf0-2710-4d9e-85a1-001c17c35a51" width="45%" />
+  <img src="https://github.com/user-attachments/assets/f7cd5e39-d841-4f74-8d3a-9021753a6858" width="45%" />
+</p>
 
----
-
-### 🔐 Login Page
-
-<img width="1892" height="867" alt="Screenshot 2026-04-23 163136" src="https://github.com/user-attachments/assets/3a29d51b-4329-4edc-a8d6-70ff1cf2cada" />
-
-
----
-
-### 📝 Signup Page
-
-<img width="1862" height="869" alt="Screenshot 2026-04-23 163152" src="https://github.com/user-attachments/assets/dd23fcc7-34e3-45d3-932d-9f95f3afa8d2" />
-
-
----
-
-### 📊 Dashboard
-
-<img width="1919" height="867" alt="Screenshot 2026-04-23 163517" src="https://github.com/user-attachments/assets/275d3372-a03f-4491-9f8d-0099a10adc29" />
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/40b5c0d3-7b94-446a-8cb2-67915d5c7a92" width="45%" />
+  <img src="https://github.com/user-attachments/assets/61c94b14-3585-4831-858c-843a3208269b" width="45%" />
+</p>
 
 ---
-
-### 📄 Result Page
-
-<img width="1065" height="701" alt="Screenshot 2026-04-22 115638" src="https://github.com/user-attachments/assets/2facecf0-2710-4d9e-85a1-001c17c35a51" />
-
-
----
-
-### 🧾 Resume Builder
-
-<img width="1917" height="877" alt="Screenshot 2026-04-23 163503" src="https://github.com/user-attachments/assets/f7cd5e39-d841-4f74-8d3a-9021753a6858" />
-
-
----
-
-### 👤 Profile Page
-
-<img width="1919" height="873" alt="Screenshot 2026-04-23 163536" src="https://github.com/user-attachments/assets/40b5c0d3-7b94-446a-8cb2-67915d5c7a92" />
-
-
----
-
-### 📜 Analysis History
-
-<img width="1919" height="874" alt="Screenshot 2026-04-23 163556" src="https://github.com/user-attachments/assets/61c94b14-3585-4831-858c-843a3208269b" />
-
-
 
 ## 🔗 Live Demo
 
@@ -159,8 +152,8 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 
 ## 🎯 Future Improvements
 
-* 🤖 Advanced AI-based analysis
-* 📊 Better ATS scoring system
+* 🤖 Advanced AI-based skill extraction
+* 📊 Improved ATS scoring system
 * 📱 Fully responsive UI
 * 🧾 Multiple resume templates
 
@@ -170,10 +163,14 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 
 **Harshad Shinde**
 FTC Sangola
+
 * GitHub: https://github.com/Harshu3115
+* LinkedIn: *https://www.linkedin.com/in/harshad-shinde3115b2ab/*
 
 ---
 
 ## ⭐ Support
 
 If you like this project, give it a ⭐ on GitHub!
+
+---
