@@ -7,3 +7,4 @@ requests
 python-docx
 flask-mail
 itsdangerous
+gunicorn
