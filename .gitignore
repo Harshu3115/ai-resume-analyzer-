@@ -1,0 +1,18 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore generated files
+*.pdf
+*.docx
+chart.png
+generated/
+static/uploads/
+
+# Database
+*.db
+
+# Temp / duplicate files
+*Copy*
