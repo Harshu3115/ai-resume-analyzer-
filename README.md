@@ -50,10 +50,12 @@ An AI-powered web application that analyzes resumes, extracts key skills, matche
 
 **Libraries Used:**
 
-* PyMuPDF
-* python-docx
-* Flask-Mail
-* Authlib
+* PyMuPDF --> pip install pyMuPDF
+* Flask-Mail --> pip install Flask-Mail
+* Authlib --> pip install authlib
+* Flask --> pip install flask
+* python-docx --> pip install python-docx
+* reportlab --> pip install reportlab
 
 ---
 
